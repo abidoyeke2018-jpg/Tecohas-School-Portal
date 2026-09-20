@@ -825,11 +825,11 @@ footer { background: var(--navy); color: rgba(255,255,255,0.8); padding: 60px 0 
    ADMIN PORTAL STYLES
    ============================================================ */
 #admin-login-overlay {
-  position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;
-  display:none;align-items:center;justify-content:center;padding:20px;
-  backdrop-filter:blur(6px);
+  position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);
+  z-index:99999;display:none;align-items:center;justify-content:center;
+  padding:20px;backdrop-filter:blur(6px);
 }
-#admin-login-overlay.open { display:flex !important; animation:fadeIn .25s ease; }
+#admin-login-overlay[style*="flex"] { align-items:center !important; justify-content:center !important; }
 
 .admin-login-modal {
   background:#fff;border-radius:20px;overflow:hidden;
@@ -1207,7 +1207,7 @@ table.atable tr:hover td { background:#f8fafc; }
     </ul>
     <div class="nav-actions">
       <button class="btn btn-outline btn-sm" onclick="openLogin()">Portal Login</button>
-      <button class="btn btn-sm btn-admin" onclick="window.openAdminLogin()" style="background:#4338ca;color:#fff;border-color:#4338ca">🔐 Admin</button>
+      <button class="btn btn-sm btn-admin" style="background:#4338ca;color:#fff;border-color:#4338ca;cursor:pointer" onclick="(function(){ var o=document.getElementById('admin-login-overlay'); if(o){o.style.display='flex';o.classList.add('open');}else{alert('Reload the page and try again');} })()">🔐 Admin</button>
     </div>
     <button id="hamburger" aria-label="Toggle menu" aria-expanded="false" onclick="toggleMobile()">
       <span></span><span></span><span></span>
@@ -3171,9 +3171,6 @@ document.addEventListener('DOMContentLoaded',function(){
 
 <!-- ===== ADMIN + SUPABASE JS ===== -->
 <script>
-(function() {
-'use strict';
-
 // ── Supabase config ────────────────────────────────────────────────────────
 const SUPA_URL  = 'https://voflakuiebjhqygvgztk.supabase.co';
 const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvZmxha3VpZWJqaHF5Z3ZnenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1MDA0NTYsImV4cCI6MjEwNTA3NjQ1Nn0.T9rz9yYmsytabDpML-MoWwNvv7jslBdvkwDlbQRX8ks';
@@ -3731,7 +3728,7 @@ function emptyState(icon, title, msg) {
   return '<div class="admin-empty"><div class="icon">'+icon+'</div><h4>'+title+'</h4><p>'+msg+'</p></div>';
 }
 
-})(); // end IIFE
+// end admin JS
 </script>
 
 </body>
