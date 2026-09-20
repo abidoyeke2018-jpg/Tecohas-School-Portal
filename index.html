@@ -825,11 +825,11 @@ footer { background: var(--navy); color: rgba(255,255,255,0.8); padding: 60px 0 
    ADMIN PORTAL STYLES
    ============================================================ */
 #admin-login-overlay {
-  position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:3000;
+  position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;
   display:none;align-items:center;justify-content:center;padding:20px;
   backdrop-filter:blur(6px);
 }
-#admin-login-overlay.open { display:flex; animation:fadeIn .25s ease; }
+#admin-login-overlay.open { display:flex !important; animation:fadeIn .25s ease; }
 
 .admin-login-modal {
   background:#fff;border-radius:20px;overflow:hidden;
@@ -869,7 +869,7 @@ footer { background: var(--navy); color: rgba(255,255,255,0.8); padding: 60px 0 
 
 /* ADMIN DASHBOARD */
 #admin-dashboard { display:none; }
-#admin-dashboard.open { display:block; }
+#admin-dashboard.open { display:block !important; position:relative; z-index:100; }
 
 .admin-layout {
   display:grid;grid-template-columns:260px 1fr;min-height:100vh;padding-top:68px;
@@ -2788,10 +2788,10 @@ document.addEventListener('DOMContentLoaded',function(){
       <h2>TECOHAS Admin Portal</h2>
       <p>Secure access for authorised staff only</p>
       <div class="admin-role-pills">
-        <span class="admin-role-pill active" onclick="selectAdminRole('super_admin',this)">👑 Super Admin</span>
-        <span class="admin-role-pill" onclick="selectAdminRole('admissions',this)">📋 Admissions</span>
-        <span class="admin-role-pill" onclick="selectAdminRole('bursary',this)">💰 Bursary</span>
-        <span class="admin-role-pill" onclick="selectAdminRole('academic',this)">🎓 Academic</span>
+        <span class="admin-role-pill active" onclick="window.selectAdminRole('super_admin',this)">👑 Super Admin</span>
+        <span class="admin-role-pill" onclick="window.selectAdminRole('admissions',this)">📋 Admissions</span>
+        <span class="admin-role-pill" onclick="window.selectAdminRole('bursary',this)">💰 Bursary</span>
+        <span class="admin-role-pill" onclick="window.selectAdminRole('academic',this)">🎓 Academic</span>
       </div>
     </div>
     <div class="admin-login-body">
@@ -3207,18 +3207,25 @@ let selectedAdminRole = 'super_admin';
 
 // ── Admin Login modal ──────────────────────────────────────────────────────
 window.openAdminLogin = function() {
-  // Close student dashboard if open
+  // Close student portals
   var sd=document.getElementById('dashboard');
   if(sd) sd.classList.remove('open');
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
   var home=document.getElementById('page-home');
   if(home) home.classList.add('active');
   var f=document.getElementById('site-footer'); if(f) f.style.display='';
-  // Open admin login modal
-  document.getElementById('admin-login-overlay').classList.add('open');
+  // Show admin modal
+  var overlay = document.getElementById('admin-login-overlay');
+  if(overlay){
+    overlay.classList.add('open');
+    overlay.style.display = 'flex';
+  } else {
+    alert('Admin login modal not found. Please refresh the page.');
+  }
 };
 window.closeAdminLogin = function() {
-  document.getElementById('admin-login-overlay').classList.remove('open');
+  var overlay = document.getElementById('admin-login-overlay');
+  if(overlay){ overlay.classList.remove('open'); overlay.style.display = 'none'; }
 };
 window.selectAdminRole = function(role, el) {
   selectedAdminRole = role;
