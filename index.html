@@ -2804,7 +2804,7 @@ document.addEventListener('DOMContentLoaded',function(){
         <input type="password" id="admin-password" placeholder="Enter your password" autocomplete="current-password">
       </div>
       <div id="admin-login-error" style="display:none;background:#fee2e2;color:#991b1b;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;"></div>
-      <button class="btn btn-admin" style="width:100%;justify-content:center;padding:12px"
+      <button class="btn btn-admin" id="admin-signin-btn" style="width:100%;justify-content:center;padding:12px"
               onclick="window.doAdminLogin()">
         🔐 Sign In to Admin Portal
       </button>
@@ -3230,9 +3230,16 @@ window.selectAdminRole = function(role, el) {
   el.classList.add('active');
 };
 
-// ── Admin Login (Supabase Auth) ────────────────────────────────────────────
-window.doAdminLogin = async function() {
-  var email = document.getElementById('admin-email').value.trim();
+// ── Admin Login — Hardcoded credentials + Supabase data ───────────────────
+var ADMIN_CREDENTIALS = {
+  'tabukgmodel@gmail.com':    { password: 'Admin@Tecohas2026', role: 'super_admin', name: 'Akinwumi Tabitha Bukola' },
+  'arthurtemi@gmail.com':     { password: 'Tecohas@Academic3829', role: 'academic',    name: 'TECOHAS Academic Officer' },
+  'tecohasregistry@gmail.com':{ password: 'Tecohas@Registry5163', role: 'admissions',  name: 'TECOHAS Registry Officer' },
+  'tecohasbursery@gmail.com': { password: 'Tecohas@Bursary9204',  role: 'bursary',     name: 'TECOHAS Bursary Officer'  }
+};
+
+window.doAdminLogin = function() {
+  var email = document.getElementById('admin-email').value.trim().toLowerCase();
   var pass  = document.getElementById('admin-password').value.trim();
   var errEl = document.getElementById('admin-login-error');
   errEl.style.display = 'none';
@@ -3242,35 +3249,32 @@ window.doAdminLogin = async function() {
     errEl.style.display = 'block'; return;
   }
 
-  var btn = event.target;
-  btn.textContent = '⏳ Signing in...'; btn.disabled = true;
+  var btn = document.getElementById('admin-signin-btn');
+  if(btn){ btn.textContent = '⏳ Signing in...'; btn.disabled = true; }
 
+  // Check credentials
+  var cred = ADMIN_CREDENTIALS[email];
+  if (!cred || cred.password !== pass) {
+    errEl.textContent = 'Incorrect email or password. Please try again.';
+    errEl.style.display = 'block';
+    if(btn){ btn.textContent = '🔐 Sign In to Admin Portal'; btn.disabled = false; }
+    return;
+  }
+
+  // Valid — set session
+  adminSession = { loggedIn: true, role: cred.role, email: email, name: cred.name };
+
+  // Also try Supabase auth in background (non-blocking)
   try {
     var sb = getSB();
-    if (!sb) throw new Error('Database connection failed. Please refresh.');
+    if (sb) sb.auth.signInWithPassword({ email: email, password: pass }).catch(function(){});
+  } catch(e) {}
 
-    var { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
-    if (error) throw error;
-
-    // Fetch staff profile to get role
-    var { data: profile, error: profErr } = await sb
-      .from('staff')
-      .select('*')
-      .eq('email', email)
-      .single();
-
-    var role = profile ? profile.role : selectedAdminRole;
-    var name = profile ? profile.full_name : email.split('@')[0];
-
-    adminSession = { loggedIn: true, role, email, name };
+  setTimeout(function() {
     window.closeAdminLogin();
     window.launchAdminDashboard();
-
-  } catch(err) {
-    errEl.textContent = err.message || 'Login failed. Check your credentials.';
-    errEl.style.display = 'block';
-    btn.textContent = '🔐 Sign In to Admin Portal'; btn.disabled = false;
-  }
+    if(btn){ btn.textContent = '🔐 Sign In to Admin Portal'; btn.disabled = false; }
+  }, 600);
 };
 
 // ── Launch Admin Dashboard ─────────────────────────────────────────────────
