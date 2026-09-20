@@ -2503,13 +2503,25 @@ window.switchLoginTab=function(role,el){
 window.doLogin=function(){
   var id=document.getElementById('login-id').value.trim(), pw=document.getElementById('login-pass').value.trim();
   if(!id||!pw){window.showToast('Please enter your credentials.','error');return;}
+
+  // Block admin emails from student portal
+  var adminEmails=['tabukgmodel@gmail.com','arthurtemi@gmail.com','tecohasregistry@gmail.com','tecohasbursery@gmail.com'];
+  if(adminEmails.indexOf(id.toLowerCase())>-1){
+    window.closeLogin();
+    window.showToast('Admin accounts must use the Admin button.','error');
+    setTimeout(function(){ window.openAdminLogin(); },800);
+    return;
+  }
+
   window.closeLogin(); window.showToast('Verifying credentials...','');
   setTimeout(function(){
+    var ad=document.getElementById('admin-dashboard');
+    if(ad){ ad.classList.remove('open'); ad.style.display='none'; }
     document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
     var d=document.getElementById('dashboard'), f=document.getElementById('site-footer');
     if(d) d.classList.add('open'); if(f) f.style.display='none';
     window.scrollTo({top:0,behavior:'smooth'}); setDashDate();
-    window.showToast('Welcome back! ✅','success');
+    window.showToast('Welcome back! Done','success');
   },900);
 };
 
@@ -3195,6 +3207,14 @@ let selectedAdminRole = 'super_admin';
 
 // ── Admin Login modal ──────────────────────────────────────────────────────
 window.openAdminLogin = function() {
+  // Close student dashboard if open
+  var sd=document.getElementById('dashboard');
+  if(sd) sd.classList.remove('open');
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  var home=document.getElementById('page-home');
+  if(home) home.classList.add('active');
+  var f=document.getElementById('site-footer'); if(f) f.style.display='';
+  // Open admin login modal
   document.getElementById('admin-login-overlay').classList.add('open');
 };
 window.closeAdminLogin = function() {
