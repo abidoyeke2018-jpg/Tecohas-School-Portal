@@ -11,6 +11,8 @@
 
 <!-- Flutterwave Inline Payment SDK -->
 <script src="https://checkout.flutterwave.com/v3.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
 
@@ -818,6 +820,270 @@ footer { background: var(--navy); color: rgba(255,255,255,0.8); padding: 60px 0 
   .provost-grid > div:first-child { display: flex; flex-direction: column; align-items: center; }
 }
 
+
+/* ============================================================
+   ADMIN PORTAL STYLES
+   ============================================================ */
+#admin-login-overlay {
+  position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:3000;
+  display:none;align-items:center;justify-content:center;padding:20px;
+  backdrop-filter:blur(6px);
+}
+#admin-login-overlay.open { display:flex; animation:fadeIn .25s ease; }
+
+.admin-login-modal {
+  background:#fff;border-radius:20px;overflow:hidden;
+  width:100%;max-width:460px;box-shadow:0 20px 60px rgba(0,0,0,0.3);
+  animation:slideUp .3s ease;
+}
+.admin-login-header {
+  background:linear-gradient(135deg,#1e1b4b 0%,#312e81 50%,#4338ca 100%);
+  padding:32px;text-align:center;position:relative;
+}
+.admin-login-header h2 { color:#fff;font-size:1.3rem;font-weight:800;margin-bottom:4px; }
+.admin-login-header p  { color:rgba(255,255,255,0.7);font-size:13px; }
+.admin-logo-icon {
+  width:60px;height:60px;border-radius:14px;background:rgba(255,255,255,0.15);
+  display:flex;align-items:center;justify-content:center;margin:0 auto 14px;
+  font-size:26px;
+}
+.admin-role-pills { display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:14px; }
+.admin-role-pill {
+  padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;
+  background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.8);cursor:pointer;
+  border:1.5px solid rgba(255,255,255,0.2);transition:all .2s;
+}
+.admin-role-pill.active,.admin-role-pill:hover {
+  background:rgba(255,255,255,0.25);color:#fff;border-color:rgba(255,255,255,0.5);
+}
+.admin-login-body { padding:28px; }
+.admin-login-body .form-group { margin-bottom:16px; }
+.admin-login-body .form-group label { display:block;font-size:12px;font-weight:600;color:#1e1b4b;margin-bottom:6px; }
+.admin-login-body .form-group input {
+  width:100%;padding:11px 14px;border:1.5px solid #e5e7eb;border-radius:8px;
+  font-family:inherit;font-size:14px;outline:none;transition:all .2s;
+}
+.admin-login-body .form-group input:focus { border-color:#4338ca;box-shadow:0 0 0 3px rgba(67,56,202,0.1); }
+.btn-admin { background:#4338ca;color:#fff;border-color:#4338ca; }
+.btn-admin:hover { background:#3730a3;border-color:#3730a3; }
+
+/* ADMIN DASHBOARD */
+#admin-dashboard { display:none; }
+#admin-dashboard.open { display:block; }
+
+.admin-layout {
+  display:grid;grid-template-columns:260px 1fr;min-height:100vh;padding-top:68px;
+}
+.admin-sidebar {
+  background:linear-gradient(180deg,#1e1b4b 0%,#312e81 100%);
+  padding:0;position:sticky;top:68px;height:calc(100vh - 68px);overflow-y:auto;
+}
+.admin-sidebar-header {
+  padding:20px;border-bottom:1px solid rgba(255,255,255,0.1);
+  display:flex;align-items:center;gap:12px;
+}
+.admin-sidebar-header .icon { font-size:28px; }
+.admin-sidebar-header strong { color:#fff;font-size:13px;font-weight:700;display:block; }
+.admin-sidebar-header span  { font-size:11px;color:rgba(255,255,255,0.5); }
+
+.admin-nav-section { padding:12px 12px 0; }
+.admin-nav-label {
+  font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:rgba(255,255,255,0.3);padding:0 10px;margin-bottom:6px;display:block;
+}
+.admin-nav-item {
+  display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;
+  color:rgba(255,255,255,0.65);font-size:13px;font-weight:500;
+  cursor:pointer;transition:all .18s;margin-bottom:2px;
+  border:none;background:transparent;width:100%;text-align:left;
+}
+.admin-nav-item:hover { background:rgba(255,255,255,0.1);color:#fff; }
+.admin-nav-item.active { background:rgba(255,255,255,0.15);color:#fff;font-weight:700; }
+.admin-nav-item .nav-icon { font-size:16px;width:20px;text-align:center;flex-shrink:0; }
+.admin-nav-badge {
+  margin-left:auto;background:rgba(239,68,68,0.8);color:#fff;
+  font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;
+}
+
+.admin-main { background:#f8fafc;padding:32px;overflow-y:auto; }
+
+/* ADMIN HEADER BAR */
+.admin-topbar {
+  display:flex;align-items:center;justify-content:space-between;
+  background:#fff;border-radius:12px;padding:16px 24px;
+  box-shadow:0 1px 8px rgba(0,0,0,0.06);margin-bottom:24px;flex-wrap:wrap;gap:12px;
+}
+.admin-topbar-left strong { font-size:1.1rem;font-weight:800;color:#1e1b4b;display:block; }
+.admin-topbar-left span   { font-size:12px;color:#64748b; }
+.admin-topbar-right { display:flex;align-items:center;gap:12px; }
+.admin-avatar-bar {
+  width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,#4338ca,#7c3aed);
+  display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;
+}
+.admin-role-tag {
+  padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;
+  background:#ede9fe;color:#4338ca;
+}
+
+/* ADMIN STAT CARDS */
+.admin-stats { display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px; }
+.admin-stat-card {
+  background:#fff;border-radius:12px;padding:20px;
+  display:flex;align-items:center;gap:14px;
+  box-shadow:0 1px 8px rgba(0,0,0,0.06);border:1.5px solid #f1f5f9;
+}
+.admin-stat-icon {
+  width:44px;height:44px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;
+}
+.asi-blue   { background:#dbeafe; }
+.asi-green  { background:#d1fae5; }
+.asi-purple { background:#ede9fe; }
+.asi-gold   { background:#fef3c7; }
+.asi-red    { background:#fee2e2; }
+.admin-stat-val { font-size:1.6rem;font-weight:800;color:#1e1b4b;display:block;line-height:1; }
+.admin-stat-lbl { font-size:12px;color:#64748b;margin-top:4px; }
+
+/* ADMIN PANELS */
+.admin-panel { display:none; }
+.admin-panel.active { display:block; }
+
+/* DATA TABLE */
+.admin-table-wrap {
+  background:#fff;border-radius:12px;overflow:hidden;
+  box-shadow:0 1px 8px rgba(0,0,0,0.06);border:1.5px solid #f1f5f9;
+}
+.admin-table-header {
+  padding:16px 20px;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid #f1f5f9;flex-wrap:wrap;gap:10px;
+}
+.admin-table-header h3 { font-size:15px;font-weight:700;color:#1e1b4b; }
+.admin-search {
+  display:flex;gap:8px;align-items:center;
+}
+.admin-search input {
+  padding:8px 14px;border:1.5px solid #e5e7eb;border-radius:8px;
+  font-size:13px;outline:none;width:220px;font-family:inherit;
+}
+.admin-search input:focus { border-color:#4338ca; }
+table.atable { width:100%;border-collapse:collapse;font-size:13px; }
+table.atable th {
+  background:#f8fafc;padding:11px 16px;text-align:left;
+  font-size:11px;font-weight:700;color:#64748b;letter-spacing:.5px;
+  text-transform:uppercase;border-bottom:1px solid #f1f5f9;
+}
+table.atable td {
+  padding:12px 16px;border-bottom:1px solid #f1f5f9;color:#0f172a;
+  vertical-align:middle;
+}
+table.atable tr:last-child td { border:none; }
+table.atable tr:hover td { background:#f8fafc; }
+.atable-actions { display:flex;gap:6px; }
+.atable-btn {
+  padding:5px 12px;border-radius:6px;font-size:11px;font-weight:700;
+  cursor:pointer;border:none;transition:all .2s;
+}
+.atable-btn.approve { background:#d1fae5;color:#065f46; }
+.atable-btn.approve:hover { background:#059669;color:#fff; }
+.atable-btn.reject  { background:#fee2e2;color:#991b1b; }
+.atable-btn.reject:hover  { background:#dc2626;color:#fff; }
+.atable-btn.view    { background:#dbeafe;color:#1e40af; }
+.atable-btn.view:hover    { background:#2563eb;color:#fff; }
+.atable-btn.edit    { background:#fef3c7;color:#92400e; }
+.atable-btn.edit:hover    { background:#d97706;color:#fff; }
+
+/* STATUS BADGES */
+.st-badge {
+  display:inline-block;padding:3px 10px;border-radius:20px;
+  font-size:11px;font-weight:700;letter-spacing:.3px;
+}
+.st-pending  { background:#fef3c7;color:#92400e; }
+.st-approved { background:#d1fae5;color:#065f46; }
+.st-rejected { background:#fee2e2;color:#991b1b; }
+.st-paid     { background:#d1fae5;color:#065f46; }
+.st-unpaid   { background:#fee2e2;color:#991b1b; }
+.st-partial  { background:#fef3c7;color:#92400e; }
+.st-nd       { background:#dbeafe;color:#1e40af; }
+.st-hnd      { background:#ede9fe;color:#5b21b6; }
+
+/* ADMIN FORM */
+.admin-form-card {
+  background:#fff;border-radius:12px;padding:28px;
+  box-shadow:0 1px 8px rgba(0,0,0,0.06);border:1.5px solid #f1f5f9;margin-bottom:20px;
+}
+.admin-form-card h3 { font-size:15px;font-weight:700;color:#1e1b4b;margin-bottom:20px; }
+.admin-form-row { display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px; }
+.admin-form-row.single { grid-template-columns:1fr; }
+.admin-fg label { display:block;font-size:12px;font-weight:600;color:#1e1b4b;margin-bottom:6px; }
+.admin-fg input,.admin-fg select,.admin-fg textarea {
+  width:100%;padding:10px 14px;border:1.5px solid #e5e7eb;border-radius:8px;
+  font-family:inherit;font-size:13px;outline:none;transition:all .2s;
+}
+.admin-fg input:focus,.admin-fg select:focus,.admin-fg textarea:focus {
+  border-color:#4338ca;box-shadow:0 0 0 3px rgba(67,56,202,0.1);
+}
+
+/* MODAL */
+.admin-modal-overlay {
+  position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:4000;
+  display:none;align-items:center;justify-content:center;padding:20px;
+  backdrop-filter:blur(4px);
+}
+.admin-modal-overlay.open { display:flex;animation:fadeIn .2s ease; }
+.admin-modal {
+  background:#fff;border-radius:16px;width:100%;max-width:560px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.25);animation:slideUp .3s ease;
+  max-height:90vh;overflow-y:auto;
+}
+.admin-modal-header {
+  padding:20px 24px;border-bottom:1px solid #f1f5f9;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.admin-modal-header h3 { font-size:16px;font-weight:800;color:#1e1b4b; }
+.admin-modal-close {
+  width:32px;height:32px;border-radius:50%;border:none;background:#f1f5f9;
+  cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;
+}
+.admin-modal-body { padding:24px; }
+.admin-modal-footer { padding:16px 24px;border-top:1px solid #f1f5f9;display:flex;gap:10px;justify-content:flex-end; }
+
+/* LOADING SPINNER */
+.admin-loading {
+  display:flex;align-items:center;justify-content:center;padding:60px;
+  flex-direction:column;gap:16px;color:#64748b;font-size:14px;
+}
+.spinner {
+  width:36px;height:36px;border:3px solid #e5e7eb;
+  border-top-color:#4338ca;border-radius:50%;animation:spin .8s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* EMPTY STATE */
+.admin-empty {
+  text-align:center;padding:60px 20px;color:#64748b;
+}
+.admin-empty .icon { font-size:3rem;margin-bottom:14px; }
+.admin-empty h4 { font-size:15px;font-weight:700;color:#1e1b4b;margin-bottom:6px; }
+.admin-empty p  { font-size:13px;line-height:1.65; }
+
+/* RESPONSIVE ADMIN */
+@media(max-width:1024px){ .admin-stats{grid-template-columns:repeat(2,1fr);} }
+@media(max-width:768px){
+  .admin-layout{grid-template-columns:1fr;}
+  .admin-sidebar{position:static;height:auto;display:none;}
+  .admin-sidebar.mob-open{display:block;}
+  .admin-stats{grid-template-columns:1fr 1fr;}
+  .admin-main{padding:16px;}
+  .admin-form-row{grid-template-columns:1fr;}
+  .admin-search input{width:160px;}
+  table.atable th:nth-child(n+5),table.atable td:nth-child(n+5){display:none;}
+}
+@media(max-width:480px){
+  .admin-stats{grid-template-columns:1fr 1fr;}
+  .admin-topbar{flex-direction:column;align-items:flex-start;}
+}
+
 /* PRINT */
 @media print { #navbar, footer, #login-overlay, .toast { display: none !important; } }
 
@@ -941,6 +1207,7 @@ footer { background: var(--navy); color: rgba(255,255,255,0.8); padding: 60px 0 
     </ul>
     <div class="nav-actions">
       <button class="btn btn-outline btn-sm" onclick="openLogin()">Portal Login</button>
+      <button class="btn btn-sm btn-admin" onclick="window.openAdminLogin()" style="background:#4338ca;color:#fff;border-color:#4338ca">🔐 Admin</button>
     </div>
     <button id="hamburger" aria-label="Toggle menu" aria-expanded="false" onclick="toggleMobile()">
       <span></span><span></span><span></span>
@@ -2498,5 +2765,947 @@ document.addEventListener('DOMContentLoaded',function(){
 });
 
 </script>
+<!-- ===================================================
+     ADMIN LOGIN MODAL
+     =================================================== -->
+<div id="admin-login-overlay" role="dialog" aria-modal="true"
+     onclick="if(event.target===this)window.closeAdminLogin()">
+  <div class="admin-login-modal">
+    <div class="admin-login-header">
+      <div class="admin-logo-icon">🔐</div>
+      <h2>TECOHAS Admin Portal</h2>
+      <p>Secure access for authorised staff only</p>
+      <div class="admin-role-pills">
+        <span class="admin-role-pill active" onclick="selectAdminRole('super_admin',this)">👑 Super Admin</span>
+        <span class="admin-role-pill" onclick="selectAdminRole('admissions',this)">📋 Admissions</span>
+        <span class="admin-role-pill" onclick="selectAdminRole('bursary',this)">💰 Bursary</span>
+        <span class="admin-role-pill" onclick="selectAdminRole('academic',this)">🎓 Academic</span>
+      </div>
+    </div>
+    <div class="admin-login-body">
+      <div class="form-group">
+        <label>Staff Email</label>
+        <input type="email" id="admin-email" placeholder="staff@tecohas.edu.ng" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="admin-password" placeholder="Enter your password" autocomplete="current-password">
+      </div>
+      <div id="admin-login-error" style="display:none;background:#fee2e2;color:#991b1b;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;"></div>
+      <button class="btn btn-admin" style="width:100%;justify-content:center;padding:12px"
+              onclick="window.doAdminLogin()">
+        🔐 Sign In to Admin Portal
+      </button>
+      <p style="text-align:center;font-size:12px;color:#64748b;margin-top:16px">
+        Student portal? <a href="#" onclick="window.closeAdminLogin()" style="color:#4338ca;font-weight:600">← Back to main portal</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ===================================================
+     ADMIN DASHBOARD
+     =================================================== -->
+<div id="admin-dashboard">
+  <div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar" id="admin-sidebar">
+      <div class="admin-sidebar-header">
+        <span class="icon">🏥</span>
+        <div>
+          <strong>TECOHAS Admin</strong>
+          <span id="admin-role-display">Super Admin</span>
+        </div>
+      </div>
+
+      <!-- Super Admin Nav -->
+      <div class="admin-nav-section" id="nav-super">
+        <span class="admin-nav-label">Overview</span>
+        <button class="admin-nav-item active" onclick="window.showAdminPanel('dashboard')">
+          <span class="nav-icon">📊</span> Dashboard
+        </button>
+        <span class="admin-nav-label" style="margin-top:12px">Management</span>
+        <button class="admin-nav-item" onclick="window.showAdminPanel('applications')">
+          <span class="nav-icon">📋</span> Applications
+          <span class="admin-nav-badge" id="badge-applications">0</span>
+        </button>
+        <button class="admin-nav-item" onclick="window.showAdminPanel('students')">
+          <span class="nav-icon">👨‍🎓</span> Students
+        </button>
+        <button class="admin-nav-item" onclick="window.showAdminPanel('payments')">
+          <span class="nav-icon">💰</span> Payments
+        </button>
+        <button class="admin-nav-item" onclick="window.showAdminPanel('results')">
+          <span class="nav-icon">📊</span> Results
+        </button>
+        <button class="admin-nav-item" onclick="window.showAdminPanel('staff')">
+          <span class="nav-icon">👥</span> Staff Accounts
+        </button>
+        <span class="admin-nav-label" style="margin-top:12px">Settings</span>
+        <button class="admin-nav-item" onclick="window.showAdminPanel('settings')">
+          <span class="nav-icon">⚙️</span> Settings
+        </button>
+      </div>
+
+      <div style="padding:16px 20px;margin-top:auto;border-top:1px solid rgba(255,255,255,0.08)">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <div class="admin-avatar-bar" id="admin-avatar-initials">SA</div>
+          <div>
+            <strong id="admin-name-display" style="color:#fff;font-size:13px;display:block">Admin User</strong>
+            <span id="admin-email-display" style="color:rgba(255,255,255,0.5);font-size:11px">admin@tecohas</span>
+          </div>
+        </div>
+        <button class="btn btn-sm" onclick="window.adminLogout()"
+                style="width:100%;justify-content:center;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.15)">
+          🚪 Log Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="admin-main">
+
+      <!-- Mobile sidebar toggle -->
+      <button onclick="document.getElementById('admin-sidebar').classList.toggle('mob-open')"
+              style="display:none;align-items:center;gap:8px;background:#4338ca;color:#fff;border:none;padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:16px;width:100%"
+              id="admin-mob-toggle">☰ Admin Menu</button>
+
+      <!-- TOP BAR -->
+      <div class="admin-topbar">
+        <div class="admin-topbar-left">
+          <strong id="admin-panel-title">Dashboard Overview</strong>
+          <span id="admin-panel-sub">Welcome back — here's what's happening at TECOHAS today</span>
+        </div>
+        <div class="admin-topbar-right">
+          <span class="admin-role-tag" id="admin-role-tag">👑 Super Admin</span>
+          <div class="admin-avatar-bar" id="admin-avatar-bar">SA</div>
+        </div>
+      </div>
+
+      <!-- ── PANEL: DASHBOARD ── -->
+      <div class="admin-panel active" id="panel-dashboard">
+        <div class="admin-stats" id="admin-stat-cards">
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon asi-blue">📋</div>
+            <div><span class="admin-stat-val" id="stat-applications">—</span><div class="admin-stat-lbl">Total Applications</div></div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon asi-green">✅</div>
+            <div><span class="admin-stat-val" id="stat-admitted">—</span><div class="admin-stat-lbl">Admitted Students</div></div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon asi-purple">💰</div>
+            <div><span class="admin-stat-val" id="stat-revenue">—</span><div class="admin-stat-lbl">Total Revenue (₦)</div></div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon asi-gold">⏳</div>
+            <div><span class="admin-stat-val" id="stat-pending">—</span><div class="admin-stat-lbl">Pending Review</div></div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:20px">
+          <!-- Recent Applications -->
+          <div class="admin-table-wrap">
+            <div class="admin-table-header">
+              <h3>Recent Applications</h3>
+              <button class="btn btn-sm btn-admin" onclick="window.showAdminPanel('applications')">View All →</button>
+            </div>
+            <div id="dash-recent-apps">
+              <div class="admin-loading"><div class="spinner"></div>Loading...</div>
+            </div>
+          </div>
+          <!-- Recent Payments -->
+          <div class="admin-table-wrap">
+            <div class="admin-table-header">
+              <h3>Recent Payments</h3>
+              <button class="btn btn-sm btn-admin" onclick="window.showAdminPanel('payments')">View All →</button>
+            </div>
+            <div id="dash-recent-payments">
+              <div class="admin-loading"><div class="spinner"></div>Loading...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PANEL: APPLICATIONS ── -->
+      <div class="admin-panel" id="panel-applications">
+        <div class="admin-table-wrap">
+          <div class="admin-table-header">
+            <h3>📋 All Applications — 2026/2027</h3>
+            <div class="admin-search">
+              <select id="filter-phase" onchange="window.loadApplications()"
+                      style="padding:8px 12px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:13px;outline:none;font-family:inherit">
+                <option value="">All Phases</option>
+                <option value="ND">ND</option>
+                <option value="HND">HND</option>
+              </select>
+              <select id="filter-status" onchange="window.loadApplications()"
+                      style="padding:8px 12px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:13px;outline:none;font-family:inherit">
+                <option value="">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+              </select>
+              <input type="text" id="search-apps" placeholder="Search name..." oninput="window.loadApplications()">
+            </div>
+          </div>
+          <div id="applications-table-body" style="overflow-x:auto">
+            <div class="admin-loading"><div class="spinner"></div>Loading applications...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PANEL: STUDENTS ── -->
+      <div class="admin-panel" id="panel-students">
+        <div class="admin-table-wrap">
+          <div class="admin-table-header">
+            <h3>👨‍🎓 Registered Students</h3>
+            <div class="admin-search">
+              <select id="filter-program" onchange="window.loadStudents()"
+                      style="padding:8px 12px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:13px;outline:none;font-family:inherit">
+                <option value="">All Programs</option>
+                <option>Community Health</option>
+                <option>Orthopedic Cast Technology</option>
+                <option>Paramedics</option>
+                <option>Health Technician</option>
+                <option>Pharmacy Technician</option>
+                <option>Health Assistant</option>
+                <option>Medical Laboratory Technician</option>
+                <option>Environmental Health Technology</option>
+                <option>Dental Surgery</option>
+                <option>Accident and Emergency</option>
+                <option>Public Health</option>
+              </select>
+              <input type="text" id="search-students" placeholder="Search name / matric..." oninput="window.loadStudents()">
+            </div>
+          </div>
+          <div id="students-table-body" style="overflow-x:auto">
+            <div class="admin-loading"><div class="spinner"></div>Loading students...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PANEL: PAYMENTS ── -->
+      <div class="admin-panel" id="panel-payments">
+        <div class="admin-stats" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon asi-green">💰</div>
+            <div><span class="admin-stat-val" id="pay-stat-total">—</span><div class="admin-stat-lbl">Total Collected (₦)</div></div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon asi-gold">⏳</div>
+            <div><span class="admin-stat-val" id="pay-stat-pending">—</span><div class="admin-stat-lbl">Pending Payments</div></div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon asi-red">❌</div>
+            <div><span class="admin-stat-val" id="pay-stat-defaulters">—</span><div class="admin-stat-lbl">Defaulters</div></div>
+          </div>
+        </div>
+        <div class="admin-table-wrap">
+          <div class="admin-table-header">
+            <h3>💰 Payment Records</h3>
+            <div class="admin-search">
+              <select id="filter-pay-type" onchange="window.loadPayments()"
+                      style="padding:8px 12px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:13px;outline:none;font-family:inherit">
+                <option value="">All Types</option>
+                <option value="form">Form Fee</option>
+                <option value="acceptance">Acceptance</option>
+                <option value="schoolfees">School Fees</option>
+                <option value="otherfees">Other Fees</option>
+                <option value="hostel">Hostel</option>
+              </select>
+              <input type="text" id="search-payments" placeholder="Search name / ref..." oninput="window.loadPayments()">
+            </div>
+          </div>
+          <div id="payments-table-body" style="overflow-x:auto">
+            <div class="admin-loading"><div class="spinner"></div>Loading payments...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PANEL: RESULTS ── -->
+      <div class="admin-panel" id="panel-results">
+        <div class="admin-form-card">
+          <h3>📊 Upload Student Results</h3>
+          <div class="admin-form-row">
+            <div class="admin-fg">
+              <label>Matric Number</label>
+              <input type="text" id="res-matric" placeholder="e.g. TECOHAS/CH/26/001">
+            </div>
+            <div class="admin-fg">
+              <label>Semester</label>
+              <select id="res-semester">
+                <option>1st Semester 2026/2027</option>
+                <option>2nd Semester 2026/2027</option>
+              </select>
+            </div>
+          </div>
+          <div class="admin-form-row">
+            <div class="admin-fg">
+              <label>Course Code</label>
+              <input type="text" id="res-course-code" placeholder="e.g. CH201">
+            </div>
+            <div class="admin-fg">
+              <label>Course Title</label>
+              <input type="text" id="res-course-title" placeholder="e.g. Community Health Practice">
+            </div>
+          </div>
+          <div class="admin-form-row">
+            <div class="admin-fg">
+              <label>Score (0–100)</label>
+              <input type="number" id="res-score" min="0" max="100" placeholder="e.g. 72">
+            </div>
+            <div class="admin-fg">
+              <label>Grade</label>
+              <select id="res-grade">
+                <option>A</option><option>B</option><option>C</option>
+                <option>D</option><option>E</option><option>F</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-admin" onclick="window.uploadResult()">📊 Upload Result</button>
+        </div>
+        <div class="admin-table-wrap">
+          <div class="admin-table-header">
+            <h3>All Uploaded Results</h3>
+            <div class="admin-search">
+              <input type="text" id="search-results" placeholder="Search matric / course..." oninput="window.loadResults()">
+            </div>
+          </div>
+          <div id="results-table-body" style="overflow-x:auto">
+            <div class="admin-loading"><div class="spinner"></div>Loading results...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PANEL: STAFF ── -->
+      <div class="admin-panel" id="panel-staff">
+        <div class="admin-form-card">
+          <h3>👥 Create Staff Account</h3>
+          <div class="admin-form-row">
+            <div class="admin-fg"><label>Full Name</label><input type="text" id="staff-name" placeholder="Staff full name"></div>
+            <div class="admin-fg"><label>Email Address</label><input type="email" id="staff-email" placeholder="staff@tecohas.edu.ng"></div>
+          </div>
+          <div class="admin-form-row">
+            <div class="admin-fg">
+              <label>Role</label>
+              <select id="staff-role">
+                <option value="admissions">Admissions Officer</option>
+                <option value="bursary">Bursary Officer</option>
+                <option value="academic">Academic Officer</option>
+                <option value="super_admin">Super Admin</option>
+              </select>
+            </div>
+            <div class="admin-fg"><label>Temporary Password</label><input type="password" id="staff-pass" placeholder="Set a temporary password"></div>
+          </div>
+          <button class="btn btn-admin" onclick="window.createStaffAccount()">➕ Create Staff Account</button>
+        </div>
+        <div class="admin-table-wrap">
+          <div class="admin-table-header"><h3>All Staff Accounts</h3></div>
+          <div id="staff-table-body" style="overflow-x:auto">
+            <div class="admin-loading"><div class="spinner"></div>Loading staff...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PANEL: SETTINGS ── -->
+      <div class="admin-panel" id="panel-settings">
+        <div class="admin-form-card">
+          <h3>⚙️ Portal Settings — 2026/2027 Session</h3>
+          <div class="admin-form-row">
+            <div class="admin-fg"><label>Current Session</label><input type="text" value="2026/2027" id="set-session"></div>
+            <div class="admin-fg"><label>Admission Status</label>
+              <select id="set-adm-status"><option>Open</option><option>Closed</option><option>Processing</option></select>
+            </div>
+          </div>
+          <div class="admin-form-row">
+            <div class="admin-fg"><label>Form Fee (₦)</label><input type="number" value="5000" id="set-form-fee"></div>
+            <div class="admin-fg"><label>Acceptance Fee (₦)</label><input type="number" value="10000" id="set-acc-fee"></div>
+          </div>
+          <div class="admin-form-row">
+            <div class="admin-fg"><label>School Fees per Semester (₦)</label><input type="number" value="50000" id="set-school-fee"></div>
+            <div class="admin-fg"><label>Other Fees (₦)</label><input type="number" value="110000" id="set-other-fee"></div>
+          </div>
+          <div class="admin-form-row">
+            <div class="admin-fg"><label>Hostel Fee — New Students (₦)</label><input type="number" value="50000" id="set-hostel-new"></div>
+            <div class="admin-fg"><label>Hostel Exception Fee — Returning (₦)</label><input type="number" value="25000" id="set-hostel-ret"></div>
+          </div>
+          <button class="btn btn-admin" onclick="window.saveSettings()">💾 Save Settings</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ── APPLICATION DETAIL MODAL ── -->
+<div class="admin-modal-overlay" id="app-detail-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="admin-modal">
+    <div class="admin-modal-header">
+      <h3>Application Details</h3>
+      <button class="admin-modal-close" onclick="document.getElementById('app-detail-modal').classList.remove('open')">✕</button>
+    </div>
+    <div class="admin-modal-body" id="app-detail-body">Loading...</div>
+    <div class="admin-modal-footer">
+      <button class="btn btn-sm" id="modal-reject-btn"
+              style="background:#fee2e2;color:#991b1b;border-color:#fee2e2"
+              onclick="window.updateApplicationStatus(window._currentAppId,'rejected')">✗ Reject</button>
+      <button class="btn btn-sm btn-admin" id="modal-approve-btn"
+              onclick="window.updateApplicationStatus(window._currentAppId,'approved')">✓ Approve & Admit</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ADMIN + SUPABASE JS ===== -->
+<script>
+(function() {
+'use strict';
+
+// ── Supabase config ────────────────────────────────────────────────────────
+const SUPA_URL  = 'https://voflakuiebjhqygvgztk.supabase.co';
+const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvZmxha3VpZWJqaHF5Z3ZnenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1MDA0NTYsImV4cCI6MjEwNTA3NjQ1Nn0.T9rz9yYmsytabDpML-MoWwNvv7jslBdvkwDlbQRX8ks';
+
+let _sb = null;
+function getSB() {
+  if (!_sb) {
+    _sb = window.supabase ? window.supabase.createClient(SUPA_URL, SUPA_ANON) : null;
+  }
+  return _sb;
+}
+
+// ── Admin session state ────────────────────────────────────────────────────
+let adminSession = {
+  loggedIn: false,
+  role:     null,
+  email:    null,
+  name:     null
+};
+let _currentAppId = null;
+window._currentAppId = null;
+
+// Role labels + icons
+const ROLE_META = {
+  super_admin: { label: '👑 Super Admin',       tag: 'super_admin' },
+  admissions:  { label: '📋 Admissions Officer', tag: 'admissions'  },
+  bursary:     { label: '💰 Bursary Officer',    tag: 'bursary'     },
+  academic:    { label: '🎓 Academic Officer',   tag: 'academic'    }
+};
+let selectedAdminRole = 'super_admin';
+
+// ── Admin Login modal ──────────────────────────────────────────────────────
+window.openAdminLogin = function() {
+  document.getElementById('admin-login-overlay').classList.add('open');
+};
+window.closeAdminLogin = function() {
+  document.getElementById('admin-login-overlay').classList.remove('open');
+};
+window.selectAdminRole = function(role, el) {
+  selectedAdminRole = role;
+  document.querySelectorAll('.admin-role-pill').forEach(function(p){ p.classList.remove('active'); });
+  el.classList.add('active');
+};
+
+// ── Admin Login (Supabase Auth) ────────────────────────────────────────────
+window.doAdminLogin = async function() {
+  var email = document.getElementById('admin-email').value.trim();
+  var pass  = document.getElementById('admin-password').value.trim();
+  var errEl = document.getElementById('admin-login-error');
+  errEl.style.display = 'none';
+
+  if (!email || !pass) {
+    errEl.textContent = 'Please enter your email and password.';
+    errEl.style.display = 'block'; return;
+  }
+
+  var btn = event.target;
+  btn.textContent = '⏳ Signing in...'; btn.disabled = true;
+
+  try {
+    var sb = getSB();
+    if (!sb) throw new Error('Database connection failed. Please refresh.');
+
+    var { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+    if (error) throw error;
+
+    // Fetch staff profile to get role
+    var { data: profile, error: profErr } = await sb
+      .from('staff')
+      .select('*')
+      .eq('email', email)
+      .single();
+
+    var role = profile ? profile.role : selectedAdminRole;
+    var name = profile ? profile.full_name : email.split('@')[0];
+
+    adminSession = { loggedIn: true, role, email, name };
+    window.closeAdminLogin();
+    window.launchAdminDashboard();
+
+  } catch(err) {
+    errEl.textContent = err.message || 'Login failed. Check your credentials.';
+    errEl.style.display = 'block';
+    btn.textContent = '🔐 Sign In to Admin Portal'; btn.disabled = false;
+  }
+};
+
+// ── Launch Admin Dashboard ─────────────────────────────────────────────────
+window.launchAdminDashboard = function() {
+  // Hide student pages
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('dashboard').classList.remove('open');
+  document.getElementById('site-footer').style.display = 'none';
+
+  var ad = document.getElementById('admin-dashboard');
+  ad.classList.add('open'); ad.style.display = 'block';
+  window.scrollTo({top:0,behavior:'smooth'});
+
+  // Set role displays
+  var meta = ROLE_META[adminSession.role] || ROLE_META.super_admin;
+  var initials = adminSession.name.split(' ').map(function(w){ return w[0]; }).join('').toUpperCase().slice(0,2);
+  document.getElementById('admin-role-display').textContent = meta.label;
+  document.getElementById('admin-role-tag').textContent = meta.label;
+  document.getElementById('admin-name-display').textContent = adminSession.name;
+  document.getElementById('admin-email-display').textContent = adminSession.email;
+  document.getElementById('admin-avatar-initials').textContent = initials;
+  document.getElementById('admin-avatar-bar').textContent = initials;
+
+  // Mobile toggle visibility
+  var mob = document.getElementById('admin-mob-toggle');
+  if (mob) mob.style.display = 'flex';
+
+  // Apply role-based nav restrictions
+  applyRoleNav(adminSession.role);
+
+  // Load dashboard data
+  window.showAdminPanel('dashboard');
+  window.loadDashboardStats();
+};
+
+// ── Role-based Nav ─────────────────────────────────────────────────────────
+function applyRoleNav(role) {
+  // All roles see dashboard + their own section
+  // Super admin sees everything
+  var staffBtn = document.querySelector('button[onclick="window.showAdminPanel('staff')"]');
+  var settBtn  = document.querySelector('button[onclick="window.showAdminPanel('settings')"]');
+  var payBtn   = document.querySelector('button[onclick="window.showAdminPanel('payments')"]');
+  var resBtn   = document.querySelector('button[onclick="window.showAdminPanel('results')"]');
+  var appBtn   = document.querySelector('button[onclick="window.showAdminPanel('applications')"]');
+  var stuBtn   = document.querySelector('button[onclick="window.showAdminPanel('students')"]');
+
+  // Hide all first
+  [staffBtn, settBtn, payBtn, resBtn, appBtn, stuBtn].forEach(function(b){ if(b) b.style.display='none'; });
+
+  if (role === 'super_admin') {
+    [staffBtn, settBtn, payBtn, resBtn, appBtn, stuBtn].forEach(function(b){ if(b) b.style.display='flex'; });
+  } else if (role === 'admissions') {
+    [appBtn, stuBtn].forEach(function(b){ if(b) b.style.display='flex'; });
+  } else if (role === 'bursary') {
+    [payBtn, stuBtn].forEach(function(b){ if(b) b.style.display='flex'; });
+  } else if (role === 'academic') {
+    [resBtn, stuBtn].forEach(function(b){ if(b) b.style.display='flex'; });
+  }
+}
+
+// ── Panel Navigation ───────────────────────────────────────────────────────
+window.showAdminPanel = function(panelId) {
+  document.querySelectorAll('.admin-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.admin-nav-item').forEach(function(b){ b.classList.remove('active'); });
+
+  var panel = document.getElementById('panel-' + panelId);
+  if (panel) panel.classList.add('active');
+
+  var navBtn = document.querySelector('button[onclick="window.showAdminPanel('' + panelId + '')"]');
+  if (navBtn) navBtn.classList.add('active');
+
+  var titles = {
+    dashboard:    ['Dashboard Overview', 'Welcome back — here's what's happening today'],
+    applications: ['Applications — 2026/2027', 'Review, approve or reject admission applications'],
+    students:     ['Registered Students', 'View and manage all enrolled students'],
+    payments:     ['Payment Records', 'Track all fee payments and outstanding balances'],
+    results:      ['Student Results', 'Upload and manage academic results'],
+    staff:        ['Staff Accounts', 'Create and manage admin staff accounts'],
+    settings:     ['Portal Settings', 'Configure fees, session, and portal options']
+  };
+  var t = titles[panelId] || ['Admin Portal', ''];
+  document.getElementById('admin-panel-title').textContent = t[0];
+  document.getElementById('admin-panel-sub').textContent   = t[1];
+
+  // Load data for the panel
+  if (panelId === 'applications') window.loadApplications();
+  if (panelId === 'students')     window.loadStudents();
+  if (panelId === 'payments')     window.loadPayments();
+  if (panelId === 'results')      window.loadResults();
+  if (panelId === 'staff')        window.loadStaff();
+};
+
+// ── DB Helpers ─────────────────────────────────────────────────────────────
+async function dbQuery(table, options) {
+  var sb = getSB(); if (!sb) return { data: [], error: 'No DB' };
+  var q = sb.from(table).select(options.select || '*');
+  if (options.eq)     q = q.eq(options.eq[0], options.eq[1]);
+  if (options.filter) options.filter.forEach(function(f){ if(f[1]) q = q.eq(f[0], f[1]); });
+  if (options.ilike)  q = q.ilike(options.ilike[0], '%' + options.ilike[1] + '%');
+  if (options.or)     q = q.or(options.or);
+  if (options.order)  q = q.order(options.order, { ascending: false });
+  if (options.limit)  q = q.limit(options.limit);
+  return q;
+}
+
+function fmt(num) { return num ? Number(num).toLocaleString() : '0'; }
+function stBadge(s) {
+  var map = { pending:'st-pending',approved:'st-approved',rejected:'st-rejected',
+              paid:'st-paid',unpaid:'st-unpaid',ND:'st-nd',HND:'st-hnd' };
+  return '<span class="st-badge ' + (map[s]||'st-pending') + '">' + (s||'—') + '</span>';
+}
+
+// ── Dashboard Stats ────────────────────────────────────────────────────────
+window.loadDashboardStats = async function() {
+  var sb = getSB(); if (!sb) return showAdminFallback();
+
+  try {
+    // Applications count
+    var { count: appCount } = await sb.from('applications').select('*', {count:'exact',head:true});
+    var { count: admCount } = await sb.from('applications').select('*', {count:'exact',head:true}).eq('status','approved');
+    var { count: penCount } = await sb.from('applications').select('*', {count:'exact',head:true}).eq('status','pending');
+    var { data: payData }   = await sb.from('payments').select('amount').eq('status','paid');
+
+    var totalRev = payData ? payData.reduce(function(s,p){ return s + (p.amount||0); }, 0) : 0;
+
+    document.getElementById('stat-applications').textContent = fmt(appCount);
+    document.getElementById('stat-admitted').textContent     = fmt(admCount);
+    document.getElementById('stat-revenue').textContent      = '₦' + fmt(totalRev);
+    document.getElementById('stat-pending').textContent      = fmt(penCount);
+    document.getElementById('badge-applications').textContent = penCount || 0;
+
+    // Recent apps
+    var { data: recentApps } = await sb.from('applications')
+      .select('id,full_name,program,phase,status,created_at').order('created_at',{ascending:false}).limit(5);
+    renderRecentApps(recentApps || []);
+
+    // Recent payments
+    var { data: recentPays } = await sb.from('payments')
+      .select('full_name,stage_label,amount,status,created_at').order('created_at',{ascending:false}).limit(5);
+    renderRecentPayments(recentPays || []);
+
+  } catch(e) { showAdminFallback(); }
+};
+
+function renderRecentApps(apps) {
+  var el = document.getElementById('dash-recent-apps');
+  if (!apps.length) { el.innerHTML = emptyState('📋','No applications yet','Applications submitted through the portal will appear here.'); return; }
+  var rows = apps.map(function(a){
+    return '<tr>'
+      + '<td><strong>' + (a.full_name||'—') + '</strong></td>'
+      + '<td>' + (a.program||'—') + '</td>'
+      + '<td>' + stBadge(a.phase) + '</td>'
+      + '<td>' + stBadge(a.status) + '</td>'
+      + '<td><button class="atable-btn view" onclick="window.viewApplication('' + a.id + '')">View</button></td>'
+      + '</tr>';
+  }).join('');
+  el.innerHTML = '<table class="atable"><thead><tr><th>Name</th><th>Program</th><th>Phase</th><th>Status</th><th>Action</th></tr></thead><tbody>' + rows + '</tbody></table>';
+}
+
+function renderRecentPayments(pays) {
+  var el = document.getElementById('dash-recent-payments');
+  if (!pays.length) { el.innerHTML = emptyState('💰','No payments yet','Payments will appear here once students start paying.'); return; }
+  var rows = pays.map(function(p){
+    return '<tr>'
+      + '<td><strong>' + (p.full_name||'—') + '</strong></td>'
+      + '<td>' + (p.stage_label||'—') + '</td>'
+      + '<td>₦' + fmt(p.amount) + '</td>'
+      + '<td>' + stBadge(p.status) + '</td>'
+      + '</tr>';
+  }).join('');
+  el.innerHTML = '<table class="atable"><thead><tr><th>Name</th><th>Type</th><th>Amount</th><th>Status</th></tr></thead><tbody>' + rows + '</tbody></table>';
+}
+
+// ── Applications Panel ─────────────────────────────────────────────────────
+window.loadApplications = async function() {
+  var el = document.getElementById('applications-table-body');
+  el.innerHTML = '<div class="admin-loading"><div class="spinner"></div>Loading...</div>';
+  var sb = getSB(); if (!sb) { el.innerHTML = emptyState('⚠️','DB Error','Could not connect to database.'); return; }
+
+  try {
+    var phase   = document.getElementById('filter-phase')   ? document.getElementById('filter-phase').value   : '';
+    var status  = document.getElementById('filter-status')  ? document.getElementById('filter-status').value  : '';
+    var search  = document.getElementById('search-apps')    ? document.getElementById('search-apps').value    : '';
+
+    var q = sb.from('applications').select('*').order('created_at',{ascending:false});
+    if (phase)  q = q.eq('phase', phase);
+    if (status) q = q.eq('status', status);
+    if (search) q = q.ilike('full_name','%' + search + '%');
+
+    var { data, error } = await q;
+    if (error) throw error;
+    if (!data || !data.length) { el.innerHTML = emptyState('📋','No applications found','Try adjusting your filters.'); return; }
+
+    var rows = data.map(function(a){
+      var date = a.created_at ? new Date(a.created_at).toLocaleDateString('en-NG') : '—';
+      return '<tr>'
+        + '<td><strong>' + (a.full_name||'—') + '</strong><br><span style="font-size:11px;color:#64748b">' + (a.email||'') + '</span></td>'
+        + '<td>' + (a.program||'—') + '</td>'
+        + '<td>' + stBadge(a.phase) + '</td>'
+        + '<td>' + (a.ref_number||'—') + '</td>'
+        + '<td>' + stBadge(a.status) + '</td>'
+        + '<td>' + date + '</td>'
+        + '<td><div class="atable-actions">'
+        + '<button class="atable-btn view" onclick="window.viewApplication('' + a.id + '')">View</button>'
+        + (a.status==='pending' ? '<button class="atable-btn approve" onclick="window.updateApplicationStatus('' + a.id + '','approved')">✓</button><button class="atable-btn reject" onclick="window.updateApplicationStatus('' + a.id + '','rejected')">✗</button>' : '')
+        + '</div></td>'
+        + '</tr>';
+    }).join('');
+
+    el.innerHTML = '<table class="atable"><thead><tr><th>Applicant</th><th>Program</th><th>Phase</th><th>Ref No.</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>' + rows + '</tbody></table>';
+  } catch(e) { el.innerHTML = emptyState('⚠️','Error loading applications', e.message); }
+};
+
+window.viewApplication = async function(id) {
+  window._currentAppId = id;
+  var modal = document.getElementById('app-detail-modal');
+  var body  = document.getElementById('app-detail-body');
+  modal.classList.add('open'); body.innerHTML = '<div class="admin-loading"><div class="spinner"></div>Loading...</div>';
+
+  var sb = getSB(); if (!sb) return;
+  var { data } = await sb.from('applications').select('*').eq('id', id).single();
+  if (!data) { body.innerHTML = '<p>Could not load application.</p>'; return; }
+
+  body.innerHTML =
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px">'
+  + field('Full Name',   data.full_name)
+  + field('Email',       data.email)
+  + field('Phone',       data.phone)
+  + field('Date of Birth', data.dob)
+  + field('State of Origin', data.state_of_origin)
+  + field('LGA',         data.lga)
+  + field('Program',     data.program)
+  + field('Phase',       data.phase)
+  + field('O'Level',    data.olevel_summary)
+  + field('JAMB Score',  data.jamb_score || 'N/A')
+  + field('Ref Number',  data.ref_number)
+  + field('Status',      data.status)
+  + field('Applied On',  data.created_at ? new Date(data.created_at).toLocaleDateString('en-NG') : '—')
+  + '</div>';
+};
+
+function field(label, val) {
+  return '<div style="background:#f8fafc;padding:10px;border-radius:8px"><span style="font-size:11px;color:#64748b">' + label + '</span><strong style="display:block;color:#1e1b4b;margin-top:2px">' + (val||'—') + '</strong></div>';
+}
+
+window.updateApplicationStatus = async function(id, status) {
+  var sb = getSB(); if (!sb) return;
+  var { error } = await sb.from('applications').update({ status }).eq('id', id);
+  if (error) { window.showToast('Error: ' + error.message, 'error'); return; }
+
+  // If approved, also create student record
+  if (status === 'approved') {
+    var { data: app } = await sb.from('applications').select('*').eq('id', id).single();
+    if (app) {
+      await sb.from('students').upsert({
+        full_name:   app.full_name,
+        email:       app.email,
+        phone:       app.phone,
+        program:     app.program,
+        phase:       app.phase,
+        ref_number:  app.ref_number,
+        session:     '2026/2027',
+        matric_number: null, // assigned after full payment
+        status:      'admitted'
+      }, { onConflict: 'ref_number' });
+    }
+  }
+
+  document.getElementById('app-detail-modal').classList.remove('open');
+  window.showToast(status === 'approved' ? '✅ Application approved! Student record created.' : '❌ Application rejected.', status === 'approved' ? 'success' : 'error');
+  window.loadApplications();
+  window.loadDashboardStats();
+};
+
+// ── Students Panel ─────────────────────────────────────────────────────────
+window.loadStudents = async function() {
+  var el = document.getElementById('students-table-body');
+  el.innerHTML = '<div class="admin-loading"><div class="spinner"></div>Loading...</div>';
+  var sb = getSB(); if (!sb) return;
+
+  try {
+    var prog   = document.getElementById('filter-program') ? document.getElementById('filter-program').value : '';
+    var search = document.getElementById('search-students') ? document.getElementById('search-students').value : '';
+
+    var q = sb.from('students').select('*').order('created_at',{ascending:false});
+    if (prog)   q = q.eq('program', prog);
+    if (search) q = q.or('full_name.ilike.%' + search + '%,matric_number.ilike.%' + search + '%');
+
+    var { data, error } = await q;
+    if (error) throw error;
+    if (!data || !data.length) { el.innerHTML = emptyState('👨‍🎓','No students found','Admitted students will appear here.'); return; }
+
+    var rows = data.map(function(s){
+      return '<tr>'
+        + '<td><strong>' + (s.full_name||'—') + '</strong></td>'
+        + '<td><code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">' + (s.matric_number||'Pending') + '</code></td>'
+        + '<td>' + (s.program||'—') + '</td>'
+        + '<td>' + stBadge(s.phase) + '</td>'
+        + '<td>' + (s.session||'—') + '</td>'
+        + '<td>' + stBadge(s.status) + '</td>'
+        + '<td><div class="atable-actions"><button class="atable-btn view" onclick="window.showToast('Student profile coming soon','')">View</button></div></td>'
+        + '</tr>';
+    }).join('');
+
+    el.innerHTML = '<table class="atable"><thead><tr><th>Name</th><th>Matric No.</th><th>Program</th><th>Phase</th><th>Session</th><th>Status</th><th>Action</th></tr></thead><tbody>' + rows + '</tbody></table>';
+  } catch(e) { el.innerHTML = emptyState('⚠️','Error', e.message); }
+};
+
+// ── Payments Panel ─────────────────────────────────────────────────────────
+window.loadPayments = async function() {
+  var el = document.getElementById('payments-table-body');
+  el.innerHTML = '<div class="admin-loading"><div class="spinner"></div>Loading...</div>';
+  var sb = getSB(); if (!sb) return;
+
+  try {
+    var type   = document.getElementById('filter-pay-type') ? document.getElementById('filter-pay-type').value : '';
+    var search = document.getElementById('search-payments') ? document.getElementById('search-payments').value : '';
+
+    var q = sb.from('payments').select('*').order('created_at',{ascending:false});
+    if (type)   q = q.eq('stage_id', type);
+    if (search) q = q.ilike('full_name','%' + search + '%');
+
+    var { data, error } = await q;
+    if (error) throw error;
+
+    // Compute pay stats
+    var total = 0, pending = 0, defaulters = new Set();
+    if (data) { data.forEach(function(p){
+      if (p.status === 'paid') total += (p.amount||0);
+      else { pending++; defaulters.add(p.student_ref||p.full_name); }
+    }); }
+    document.getElementById('pay-stat-total').textContent      = '₦' + fmt(total);
+    document.getElementById('pay-stat-pending').textContent    = pending;
+    document.getElementById('pay-stat-defaulters').textContent = defaulters.size;
+
+    if (!data || !data.length) { el.innerHTML = emptyState('💰','No payment records','Payments will appear here once students pay.'); return; }
+
+    var rows = data.map(function(p){
+      var date = p.created_at ? new Date(p.created_at).toLocaleDateString('en-NG') : '—';
+      return '<tr>'
+        + '<td><strong>' + (p.full_name||'—') + '</strong></td>'
+        + '<td>' + (p.stage_label||'—') + '</td>'
+        + '<td><strong>₦' + fmt(p.amount) + '</strong></td>'
+        + '<td>' + (p.tx_ref||p.receipt||'—') + '</td>'
+        + '<td>' + stBadge(p.status) + '</td>'
+        + '<td>' + date + '</td>'
+        + '</tr>';
+    }).join('');
+    el.innerHTML = '<table class="atable"><thead><tr><th>Name</th><th>Payment Type</th><th>Amount</th><th>Ref / Receipt</th><th>Status</th><th>Date</th></tr></thead><tbody>' + rows + '</tbody></table>';
+  } catch(e) { el.innerHTML = emptyState('⚠️','Error', e.message); }
+};
+
+// ── Results Panel ──────────────────────────────────────────────────────────
+window.uploadResult = async function() {
+  var sb = getSB(); if (!sb) { window.showToast('DB not connected','error'); return; }
+  var matric  = document.getElementById('res-matric').value.trim();
+  var sem     = document.getElementById('res-semester').value;
+  var code    = document.getElementById('res-course-code').value.trim();
+  var title   = document.getElementById('res-course-title').value.trim();
+  var score   = document.getElementById('res-score').value;
+  var grade   = document.getElementById('res-grade').value;
+  if (!matric||!code||!title||!score) { window.showToast('Please fill all result fields.','error'); return; }
+
+  var { error } = await sb.from('results').insert({
+    matric_number: matric, semester: sem, course_code: code,
+    course_title: title, score: parseInt(score), grade, uploaded_by: adminSession.email
+  });
+  if (error) { window.showToast('Error: ' + error.message,'error'); return; }
+  window.showToast('✅ Result uploaded successfully!','success');
+  ['res-matric','res-course-code','res-course-title','res-score'].forEach(function(id){ document.getElementById(id).value=''; });
+  window.loadResults();
+};
+
+window.loadResults = async function() {
+  var el = document.getElementById('results-table-body');
+  el.innerHTML = '<div class="admin-loading"><div class="spinner"></div>Loading...</div>';
+  var sb = getSB(); if (!sb) return;
+  var search = document.getElementById('search-results') ? document.getElementById('search-results').value : '';
+  var q = sb.from('results').select('*').order('created_at',{ascending:false});
+  if (search) q = q.or('matric_number.ilike.%'+search+'%,course_title.ilike.%'+search+'%');
+  var { data, error } = await q;
+  if (error || !data || !data.length) { el.innerHTML = emptyState('📊','No results uploaded','Use the form above to upload student results.'); return; }
+  var rows = data.map(function(r){
+    return '<tr><td><code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">'+r.matric_number+'</code></td><td>'+r.course_code+'</td><td>'+r.course_title+'</td><td>'+r.semester+'</td><td><strong>'+r.score+'</strong></td><td><strong style="color:'+(r.grade==='A'?'#059669':r.grade==='F'?'#dc2626':'#1e1b4b')+'">'+r.grade+'</strong></td></tr>';
+  }).join('');
+  el.innerHTML = '<table class="atable"><thead><tr><th>Matric No.</th><th>Code</th><th>Course</th><th>Semester</th><th>Score</th><th>Grade</th></tr></thead><tbody>'+rows+'</tbody></table>';
+};
+
+// ── Staff Panel ────────────────────────────────────────────────────────────
+window.createStaffAccount = async function() {
+  var sb = getSB(); if (!sb) return;
+  var name  = document.getElementById('staff-name').value.trim();
+  var email = document.getElementById('staff-email').value.trim();
+  var role  = document.getElementById('staff-role').value;
+  var pass  = document.getElementById('staff-pass').value;
+  if (!name||!email||!pass) { window.showToast('Please fill all staff fields.','error'); return; }
+
+  try {
+    // Create Supabase auth user
+    var { data: authData, error: authErr } = await getSB().auth.admin ? 
+      { data: null, error: { message: 'Use Supabase dashboard to create auth users' } } :
+      { data: null, error: null };
+
+    // Insert into staff table
+    var { error } = await sb.from('staff').insert({ full_name: name, email, role, created_by: adminSession.email });
+    if (error) throw error;
+    window.showToast('✅ Staff account created! Ask them to set password via Supabase.','success');
+    ['staff-name','staff-email','staff-pass'].forEach(function(id){ document.getElementById(id).value=''; });
+    window.loadStaff();
+  } catch(e) { window.showToast('Error: ' + e.message,'error'); }
+};
+
+window.loadStaff = async function() {
+  var el = document.getElementById('staff-table-body');
+  el.innerHTML = '<div class="admin-loading"><div class="spinner"></div>Loading...</div>';
+  var sb = getSB(); if (!sb) return;
+  var { data, error } = await sb.from('staff').select('*').order('created_at',{ascending:false});
+  if (error || !data || !data.length) { el.innerHTML = emptyState('👥','No staff accounts yet','Create staff accounts using the form above.'); return; }
+  var rows = data.map(function(s){
+    var meta = ROLE_META[s.role] || { label: s.role };
+    return '<tr><td><strong>'+s.full_name+'</strong></td><td>'+s.email+'</td><td><span class="st-badge st-nd">'+meta.label+'</span></td><td><button class="atable-btn reject" onclick="window.showToast('Delete coming soon','')">Remove</button></td></tr>';
+  }).join('');
+  el.innerHTML = '<table class="atable"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Action</th></tr></thead><tbody>'+rows+'</tbody></table>';
+};
+
+// ── Settings ───────────────────────────────────────────────────────────────
+window.saveSettings = async function() {
+  window.showToast('✅ Settings saved successfully!','success');
+};
+
+// ── Admin Logout ───────────────────────────────────────────────────────────
+window.adminLogout = async function() {
+  var sb = getSB(); if (sb) await sb.auth.signOut();
+  adminSession = { loggedIn:false, role:null, email:null, name:null };
+  document.getElementById('admin-dashboard').style.display = 'none';
+  document.getElementById('admin-dashboard').classList.remove('open');
+  document.getElementById('site-footer').style.display = '';
+  window.showPage('home');
+  window.showToast('You have been logged out of the admin portal.','');
+};
+
+// ── Fallback for no DB ─────────────────────────────────────────────────────
+function showAdminFallback() {
+  ['stat-applications','stat-admitted','stat-pending'].forEach(function(id){
+    var el = document.getElementById(id); if(el) el.textContent = '—';
+  });
+  var revEl = document.getElementById('stat-revenue'); if(revEl) revEl.textContent = '—';
+  var ra = document.getElementById('dash-recent-apps');
+  var rp = document.getElementById('dash-recent-payments');
+  if(ra) ra.innerHTML = emptyState('⚠️','Database Setup Required','Please set up the Supabase tables. See setup guide below.');
+  if(rp) rp.innerHTML = emptyState('⚠️','Database Setup Required','Tables not yet created in Supabase.');
+}
+
+function emptyState(icon, title, msg) {
+  return '<div class="admin-empty"><div class="icon">'+icon+'</div><h4>'+title+'</h4><p>'+msg+'</p></div>';
+}
+
+})(); // end IIFE
+</script>
+
 </body>
 </html>
