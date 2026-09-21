@@ -1240,17 +1240,17 @@ table.atable tr:hover td { background:#f8fafc; }
     </div>
     <div class="login-body">
       <div class="form-group">
-        <label for="login-id">Matriculation / Staff Number</label>
+        <label for="login-id">Matric Number</label>
         <input type="text" id="login-id" placeholder="e.g. TECOHAS/PH/26/001" autocomplete="username">
       </div>
       <div class="form-group">
-        <label for="login-pass">Password <a href="#" class="login-forgot">Forgot password?</a></label>
+        <label for="login-pass">Password <span style="font-size:11px;color:var(--muted)">(default: your surname)</span></label>
         <input type="password" id="login-pass" placeholder="Enter your password" autocomplete="current-password">
       </div>
-      <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px" onclick="doLogin()">
-        Sign In to Portal →
+      <button class="btn btn-primary" id="student-login-btn" style="width:100%;justify-content:center;margin-top:8px" onclick="window.doLogin()">
+        Sign In →
       </button>
-      <p class="login-footer-text">First time? <a href="#" onclick="closeLogin();showPage('admissions')">Apply for Admission</a></p>
+      <p class="login-footer-text">Default password is your <strong>surname</strong> (e.g. if your name is John Doe, password is <strong>Doe</strong>)</p>
       <p class="login-footer-text" style="margin-top:6px">Need help? <a href="#" onclick="closeLogin();showPage('contact')">Contact Support</a></p>
     </div>
   </div>
@@ -2216,8 +2216,8 @@ table.atable tr:hover td { background:#f8fafc; }
       <div class="dash-grid">
         <!-- Registered Courses -->
         <div class="dash-card">
-          <h4>Registered Courses <a href="#">View All</a></h4>
-          <div class="course-item">
+          <h4>Results / Courses <a href="#">View All</a></h4>
+          <div id="dash-courses"><div class="course-item">
             <div class="course-item-left">
               <div class="course-num">CH1</div>
               <div class="course-info"><strong>Community Health Practice I</strong><span>Dr. Musa Ibrahim · 3 Units</span></div>
@@ -2271,7 +2271,7 @@ table.atable tr:hover td { background:#f8fafc; }
         <!-- Fee Status -->
         <div class="dash-card">
           <h4>Fee Payment Status <a href="#" onclick="window.showToast('Opening Flutterwave payment window...','');">Pay Now</a></h4>
-          <div class="payment-card">
+          <div id="dash-payments"><div class="payment-card">
             <div class="payment-info"><strong>Application Form Fee</strong><span>Paid on: Sep 10, 2026</span></div>
             <div style="text-align:right"><div class="payment-amount">₦5,000</div><span class="badge badge-green" style="margin-top:4px">PAID</span></div>
           </div>
@@ -2500,29 +2500,211 @@ window.switchLoginTab=function(role,el){
   if(i) i.placeholder=role==='student'?'e.g. TECOHAS/CH/26/001':role==='staff'?'e.g. STAFF/2021/005':'e.g. ADMIN/001';
 };
 
-window.doLogin=function(){
-  var id=document.getElementById('login-id').value.trim(), pw=document.getElementById('login-pass').value.trim();
-  if(!id||!pw){window.showToast('Please enter your credentials.','error');return;}
+// ── Active student session ────────────────────────────────────────────────
+var studentSession = null;
 
-  // Block admin emails from student portal
-  var adminEmails=['tabukgmodel@gmail.com','arthurtemi@gmail.com','tecohasregistry@gmail.com','tecohasbursery@gmail.com'];
-  if(adminEmails.indexOf(id.toLowerCase())>-1){
-    window.closeLogin();
-    window.showToast('Admin accounts must use the Admin button.','error');
-    setTimeout(function(){ window.openAdminLogin(); },800);
+window.doLogin = async function() {
+  var matricNum = document.getElementById('login-id').value.trim().toUpperCase();
+  var password  = document.getElementById('login-pass').value.trim();
+
+  if (!matricNum || !password) {
+    window.showToast('Please enter your Matric Number and password.', 'error');
     return;
   }
 
-  window.closeLogin(); window.showToast('Verifying credentials...','');
-  setTimeout(function(){
-    var ad=document.getElementById('admin-dashboard');
-    if(ad){ ad.classList.remove('open'); ad.style.display='none'; }
-    document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
-    var d=document.getElementById('dashboard'), f=document.getElementById('site-footer');
-    if(d) d.classList.add('open'); if(f) f.style.display='none';
-    window.scrollTo({top:0,behavior:'smooth'}); setDashDate();
-    window.showToast('Welcome back! Done','success');
-  },900);
+  // Block admin emails
+  var adminEmails = ['tabukgmodel@gmail.com','arthurtemi@gmail.com','tecohasregistry@gmail.com','tecohasbursery@gmail.com'];
+  if (adminEmails.indexOf(matricNum.toLowerCase()) > -1) {
+    window.closeLogin();
+    window.showToast('Admin accounts must use the Admin button.', 'error');
+    setTimeout(function(){ window.openAdminLogin(); }, 800);
+    return;
+  }
+
+  var btn = document.getElementById('student-login-btn');
+  if (btn) { btn.textContent = '⏳ Verifying...'; btn.disabled = true; }
+  window.closeLogin();
+  window.showToast('Verifying credentials...', '');
+
+  try {
+    var sb = window.supabase ? window.supabase.createClient(
+      'https://voflakuiebjhqygvgztk.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvZmxha3VpZWJqaHF5Z3ZnenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1MDA0NTYsImV4cCI6MjEwNTA3NjQ1Nn0.T9rz9yYmsytabDpML-MoWwNvv7jslBdvkwDlbQRX8ks'
+    ) : null;
+
+    if (!sb) throw new Error('Database connection failed.');
+
+    // Look up student by matric number
+    var { data: student, error } = await sb
+      .from('students')
+      .select('*')
+      .eq('matric_number', matricNum)
+      .single();
+
+    if (error || !student) {
+      window.showToast('Matric Number not found. Please check and try again.', 'error');
+      window.openLogin();
+      if (btn) { btn.textContent = 'Sign In →'; btn.disabled = false; }
+      return;
+    }
+
+    // Check password: surname (case-insensitive)
+    var surname = student.full_name ? student.full_name.split(' ')[student.full_name.split(' ').length - 1].toLowerCase() : '';
+    var inputPass = password.toLowerCase();
+
+    if (inputPass !== surname) {
+      window.showToast('Incorrect password. Use your surname as default password.', 'error');
+      window.openLogin();
+      if (btn) { btn.textContent = 'Sign In →'; btn.disabled = false; }
+      return;
+    }
+
+    // Fetch student payments
+    var { data: payments } = await sb
+      .from('payments')
+      .select('*')
+      .eq('ref_number', student.ref_number);
+
+    // Fetch student results
+    var { data: results } = await sb
+      .from('results')
+      .select('*')
+      .eq('matric_number', matricNum);
+
+    // Store session
+    studentSession = { student, payments: payments || [], results: results || [] };
+
+    // Launch dashboard with real data
+    window.closeLogin();
+    window.launchStudentDashboard(student, payments || [], results || []);
+    window.showToast('Welcome back, ' + student.full_name.split(' ')[0] + '! \u2705', 'success');
+
+  } catch(err) {
+    window.showToast('Login error: ' + err.message, 'error');
+    window.openLogin();
+    if (btn) { btn.textContent = 'Sign In →'; btn.disabled = false; }
+  }
+};
+
+// ── Launch real student dashboard ─────────────────────────────────────────
+window.launchStudentDashboard = function(student, payments, results) {
+  var ad = document.getElementById('admin-dashboard');
+  if (ad) { ad.classList.remove('open'); ad.style.display = 'none'; }
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  var d = document.getElementById('dashboard'), f = document.getElementById('site-footer');
+  if (d) d.classList.add('open'); if (f) f.style.display = 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  setDashDate();
+
+  // Get first name
+  var nameParts   = student.full_name ? student.full_name.split(' ') : ['Student'];
+  var firstName   = nameParts[0];
+  var initials    = nameParts.map(function(w){ return w[0]; }).join('').toUpperCase().slice(0,2);
+  var matric      = student.matric_number || '—';
+  var program     = student.program || '—';
+  var phase       = student.phase || 'ND';
+
+  // Update greeting
+  var greet = document.querySelector('.dash-greeting strong');
+  var hour  = new Date().getHours();
+  var tod   = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
+  if (greet) greet.textContent = 'Good ' + tod + ', ' + firstName + ' \uD83D\uDC4B';
+
+  // Update user info
+  var nameEl = document.querySelector('.dash-user .dash-avatar');
+  if (nameEl) nameEl.textContent = initials;
+
+  var nameDisp = document.querySelector('.dash-user > div > strong');
+  if (nameDisp) nameDisp.textContent = student.full_name;
+
+  var matricDisp = document.querySelector('.dash-user > div > div');
+  if (matricDisp) matricDisp.textContent = matric + ' · ' + program;
+
+  // Update sidebar
+  var sidebarName = document.querySelector('.dash-sidebar-logo strong');
+  if (sidebarName) sidebarName.textContent = student.full_name;
+  var sidebarSub = document.querySelector('.dash-sidebar-logo span');
+  if (sidebarSub) sidebarSub.textContent = phase + ' · ' + program;
+
+  // Compute payment stats
+  var totalPaid = 0, outstanding = 0;
+  var requiredStages = ['form','acceptance','schoolfees','otherfees','hostel'];
+  var requiredAmounts = { form:5000, acceptance:10000, schoolfees:50000, otherfees:110000, hostel:50000 };
+  var paidStages = {};
+  payments.forEach(function(p){ paidStages[p.stage_id] = p; totalPaid += (p.amount||0); });
+  requiredStages.forEach(function(s){
+    if (!paidStages[s]) outstanding += (requiredAmounts[s] || 0);
+  });
+
+  // Update stat cards
+  var statCards = document.querySelectorAll('.dash-stat-val');
+  if (statCards[0]) statCards[0].textContent = results.length || '0';
+  if (statCards[1]) statCards[1].textContent = results.length > 0 ? computeGPA(results) : '—';
+  if (statCards[2]) statCards[2].textContent = outstanding > 0 ? '\u20A6' + outstanding.toLocaleString() : '\u20A60';
+  if (statCards[3]) statCards[3].textContent = student.student_type === 'returning' ? 'Returning' : 'Year 1';
+
+  // Update payment reminder
+  var alertEl = document.querySelector('.dash-main > div[style*="FEF3C7"]');
+  if (alertEl) {
+    if (outstanding > 0) {
+      alertEl.style.display = 'flex';
+      var alertSpan = alertEl.querySelector('span[style*="78350F"]');
+      if (alertSpan) alertSpan.textContent = 'You have outstanding fees of \u20A6' + outstanding.toLocaleString() + '. Please pay to avoid restrictions.';
+    } else {
+      alertEl.style.display = 'none';
+    }
+  }
+
+  // Render results in dash
+  renderStudentResults(results);
+  renderStudentPayments(payments);
+};
+
+function computeGPA(results) {
+  if (!results || !results.length) return '—';
+  var gradePoints = { A:5, B:4, C:3, D:2, E:1, F:0 };
+  var total = 0;
+  results.forEach(function(r){ total += (gradePoints[r.grade] || 0); });
+  return (total / results.length).toFixed(1);
+}
+
+function renderStudentResults(results) {
+  var courseEl = document.getElementById('dash-courses');
+  if (!courseEl) return;
+  if (!results || !results.length) {
+    courseEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">No results uploaded yet.</div>';
+    return;
+  }
+  var rows = results.slice(0,4).map(function(r, i){
+    var colors = ['var(--teal)','var(--navy)','#059669','#7c3aed'];
+    return '<div class="course-item">'
+      + '<div class="course-item-left">'
+      + '<div class="course-num" style="background:var(--light);color:'+colors[i%4]+'">'+r.course_code+'</div>'
+      + '<div class="course-info"><strong>'+r.course_title+'</strong><span>'+r.semester+'</span></div>'
+      + '</div>'
+      + '<span class="badge '+(r.grade==='F'?'badge-red':'badge-green')+'">'+r.grade+' ('+r.score+')</span>'
+      + '</div>';
+  }).join('');
+  courseEl.innerHTML = rows;
+}
+
+function renderStudentPayments(payments) {
+  var payEl = document.getElementById('dash-payments');
+  if (!payEl) return;
+  var stageLabels = { form:'Application Form Fee', acceptance:'Acceptance Fee', schoolfees:'School Fees (1st Sem)', otherfees:'Other Fees', hostel:'Hostel Fee' };
+  var stageAmounts = { form:5000, acceptance:10000, schoolfees:50000, otherfees:110000, hostel:50000 };
+  var paidMap = {};
+  payments.forEach(function(p){ paidMap[p.stage_id] = p; });
+  var stages = ['form','acceptance','schoolfees','otherfees','hostel'];
+  var html = stages.map(function(s){
+    var paid = paidMap[s];
+    return '<div class="payment-card" style="border-color:'+(paid?'#86EFAC':'#FCD34D')+';background:'+(paid?'#F0FDF4':'#fff')+'">'
+      + '<div class="payment-info"><strong>'+stageLabels[s]+'</strong><span>'+(paid?'Paid on '+paid.created_at.split('T')[0]:'Not yet paid')+'</span></div>'
+      + '<div style="text-align:right"><div class="payment-amount">\u20A6'+stageAmounts[s].toLocaleString()+'</div>'
+      + '<span class="badge '+(paid?'badge-green':'badge-red')+'" style="margin-top:4px">'+(paid?'PAID':'PENDING')+'</span></div>'
+      + '</div>';
+  }).join('');
+  payEl.innerHTML = html + '<div style="margin-top:10px;font-size:12px;color:var(--muted);text-align:center">\uD83D\uDD12 Secured by Paystack</div>';
 };
 
 window.logout=function(){
