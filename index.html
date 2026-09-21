@@ -2529,7 +2529,7 @@ window.doLogin = async function() {
   try {
     var sb = window.supabase ? window.supabase.createClient(
       'https://voflakuiebjhqygvgztk.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvZmxha3VpZWJqaHF5Z3ZnenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1MDA0NTYsImV4cCI6MjEwNTA3NjQ1Nn0.T9rz9yYmsytabDpML-MoWwNvv7jslBdvkwDlbQRX8ks'
+      'sb_publishable_rPsfgR_sJo4BbovarKxiUg_60JWpwJp'
     ) : null;
 
     if (!sb) throw new Error('Database connection failed.');
@@ -3456,7 +3456,7 @@ window.adminLogout = function() {
 
 // ── Supabase config ────────────────────────────────────────────────────────
 const SUPA_URL  = 'https://voflakuiebjhqygvgztk.supabase.co';
-const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvZmxha3VpZWJqaHF5Z3ZnenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1MDA0NTYsImV4cCI6MjEwNTA3NjQ1Nn0.T9rz9yYmsytabDpML-MoWwNvv7jslBdvkwDlbQRX8ks';
+const SUPA_ANON = 'sb_publishable_rPsfgR_sJo4BbovarKxiUg_60JWpwJp';
 
 let _sb = null;
 function getSB() {
