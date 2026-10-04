@@ -1206,6 +1206,7 @@ table.atable tr:hover td { background:#f8fafc; }
       <li><a href="#" onclick="showPage('about')" data-page="about">About</a></li>
       <li><a href="#" onclick="showPage('news')" data-page="news">News</a></li>
       <li><a href="#" onclick="showPage('contact')" data-page="contact">Contact</a></li>
+      <li><a href="#" onclick="window.showPage('returning')" data-page="returning" style="color:var(--teal);font-weight:700">🎓 Existing Students</a></li>
     </ul>
     <div class="nav-actions">
       <button class="btn btn-outline btn-sm" onclick="openLogin()">Portal Login</button>
@@ -1222,6 +1223,7 @@ table.atable tr:hover td { background:#f8fafc; }
     <a href="#" onclick="showPage('about');closeMobile()">🏛 About Us</a>
     <a href="#" onclick="showPage('news');closeMobile()">📰 News & Events</a>
     <a href="#" onclick="showPage('contact');closeMobile()">📞 Contact</a>
+    <a href="#" onclick="window.showPage('returning');closeMobile()" style="color:var(--teal);font-weight:700">🎓 Existing Students</a>
     <button class="btn btn-primary" onclick="openLogin();closeMobile()">Portal Login</button>
   </div>
 </nav>
@@ -2016,6 +2018,227 @@ table.atable tr:hover td { background:#f8fafc; }
     </section>
   </div>
 </div><!-- /page-news -->
+
+<!-- =================== CONTACT PAGE =================== -->
+
+<!-- =================== RETURNING STUDENTS PAGE =================== -->
+<div class="page" id="page-returning">
+  <div style="padding-top:68px">
+    <div style="background:linear-gradient(135deg,#1e1b4b 0%,#4338ca 100%);padding:60px 0;text-align:center">
+      <div class="container">
+        <span class="section-tag" style="color:#c7d2fe">Existing Students</span>
+        <h1 style="font-family:'Playfair Display',serif;font-size:2.8rem;font-weight:800;color:#fff;margin-bottom:12px">Student Self-Registration</h1>
+        <p style="color:rgba(255,255,255,0.8);font-size:16px">Already a TECOHAS student? Register here to activate your portal account and get your Matric Number</p>
+      </div>
+    </div>
+
+    <section class="section">
+      <div class="container">
+        <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:48px;align-items:start">
+
+          <!-- Left Info -->
+          <div>
+            <span class="section-tag">How It Works</span>
+            <h2 style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:800;color:var(--navy);margin-bottom:16px">4 Simple Steps</h2>
+
+            <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:32px">
+              <div style="display:flex;gap:14px;align-items:flex-start;padding:16px;background:var(--light);border-radius:12px;border-left:4px solid var(--teal)">
+                <div style="width:34px;height:34px;border-radius:50%;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0">1</div>
+                <div><strong style="display:block;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:3px">Fill Registration Form</strong><span style="font-size:12px;color:var(--muted)">Enter your details — including your surname, email, and the year you were admitted</span></div>
+              </div>
+              <div style="display:flex;gap:14px;align-items:flex-start;padding:16px;background:var(--light);border-radius:12px;border-left:4px solid var(--gold)">
+                <div style="width:34px;height:34px;border-radius:50%;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0">2</div>
+                <div><strong style="display:block;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:3px">Await Admin Approval</strong><span style="font-size:12px;color:var(--muted)">Admissions Officer reviews and approves your registration within 24 hours</span></div>
+              </div>
+              <div style="display:flex;gap:14px;align-items:flex-start;padding:16px;background:var(--light);border-radius:12px;border-left:4px solid #7c3aed">
+                <div style="width:34px;height:34px;border-radius:50%;background:#7c3aed;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0">3</div>
+                <div>
+                  <strong style="display:block;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:3px">Log In with Default Password</strong>
+                  <span style="font-size:12px;color:var(--muted)">Your default password is:</span>
+                  <div style="margin-top:6px;background:#fff;border:1.5px solid #ede9fe;border-radius:8px;padding:8px 12px;font-size:12px;color:#5b21b6;font-family:monospace;font-weight:700">
+                    Tecohas@[YourSurname][Last3DigitsOfPhone]
+                  </div>
+                  <span style="font-size:11px;color:var(--muted);margin-top:4px;display:block">e.g. surname "Akinwumi", phone ends in 678 → <strong>Tecohas@Akinwumi678</strong></span>
+                </div>
+              </div>
+              <div style="display:flex;gap:14px;align-items:flex-start;padding:16px;background:var(--light);border-radius:12px;border-left:4px solid var(--green)">
+                <div style="width:34px;height:34px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0">4</div>
+                <div><strong style="display:block;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:3px">Matric Number Auto-Generates</strong><span style="font-size:12px;color:var(--muted)">Once logged in your Matric Number is issued instantly. Change your password anytime in your profile.</span></div>
+              </div>
+            </div>
+
+            <!-- Check Status -->
+            <div style="background:var(--light);border-radius:14px;padding:22px;border:1.5px solid var(--border)">
+              <h3 style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:6px">🔍 Check Registration Status</h3>
+              <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Already submitted? Check with your reference number.</p>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <input type="text" id="ret-status-input" placeholder="e.g. TECOHAS-RET-2026-12345"
+                       style="flex:1;min-width:0;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;outline:none">
+                <button class="btn btn-primary btn-sm" onclick="window.checkReturnStatus()">Check</button>
+              </div>
+              <div id="ret-status-result" style="display:none;margin-top:16px;padding:16px;background:#fff;border-radius:10px;border:1.5px solid var(--border)"></div>
+            </div>
+          </div>
+
+          <!-- Right: Form + Login -->
+          <div>
+
+            <!-- REGISTRATION FORM -->
+            <div style="background:#fff;border:1.5px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);margin-bottom:20px">
+              <div style="background:linear-gradient(135deg,#1e1b4b,#4338ca);padding:22px;color:#fff">
+                <h3 style="font-size:17px;font-weight:700;margin-bottom:4px">🎓 Existing Student Registration</h3>
+                <p style="font-size:13px;opacity:.8">Fill accurately — admin will verify your details</p>
+              </div>
+              <div style="padding:24px" id="ret-form-body">
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+                  <div class="form-group"><label>First Name *</label><input type="text" id="ret-firstname" placeholder="First name"></div>
+                  <div class="form-group"><label>Last Name (Surname) *</label><input type="text" id="ret-lastname" placeholder="Surname — used for default password"></div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+                  <div class="form-group"><label>Phone Number *</label><input type="tel" id="ret-phone" placeholder="08XXXXXXXXX — last 3 digits used for password"></div>
+                  <div class="form-group"><label>Email Address *</label><input type="email" id="ret-email" placeholder="you@example.com — used to log in"></div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+                  <div class="form-group">
+                    <label>Program *</label>
+                    <select id="ret-program">
+                      <option value="">Select program</option>
+                      <option>Community Health</option>
+                      <option>Orthopedic Cast Technology</option>
+                      <option>Paramedics</option>
+                      <option>Health Technician</option>
+                      <option>Pharmacy Technician</option>
+                      <option>Health Assistant</option>
+                      <option>Medical Laboratory Technician</option>
+                      <option>Environmental Health Technology</option>
+                      <option>Dental Surgery</option>
+                      <option>Accident and Emergency</option>
+                      <option>Public Health</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Phase *</label>
+                    <select id="ret-phase">
+                      <option value="">Select phase</option>
+                      <option value="ND">ND</option>
+                      <option value="HND">HND</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+                  <div class="form-group">
+                    <label>Year Admitted *</label>
+                    <select id="ret-year">
+                      <option value="">Select year admitted</option>
+                      <option value="26">2026</option>
+                      <option value="25">2025</option>
+                      <option value="24">2024</option>
+                      <option value="23">2023</option>
+                      <option value="22">2022</option>
+                      <option value="21">2021</option>
+                      <option value="20">2020</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Current Level *</label>
+                    <select id="ret-level">
+                      <option value="">Select level</option>
+                      <option>Year 1</option>
+                      <option>Year 2</option>
+                      <option>Year 3</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style="margin-bottom:14px">
+                  <div class="form-group">
+                    <label>Session Admitted *</label>
+                    <select id="ret-session">
+                      <option value="">Select session</option>
+                      <option>2026/2027</option>
+                      <option>2025/2026</option>
+                      <option>2024/2025</option>
+                      <option>2023/2024</option>
+                      <option>2022/2023</option>
+                      <option>2021/2022</option>
+                      <option>2020/2021</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style="margin-bottom:14px">
+                  <div class="form-group"><label>Previous Admission/Reference Number (if any)</label><input type="text" id="ret-prev-ref" placeholder="Leave blank if unknown"></div>
+                </div>
+
+                <!-- Passport Photo Upload -->
+                <div style="margin-bottom:18px">
+                  <label style="display:block;font-size:13px;font-weight:600;color:var(--navy);margin-bottom:8px">
+                    Passport Photograph * <span style="font-size:11px;font-weight:400;color:var(--muted)">(Clear, white background, face visible)</span>
+                  </label>
+                  <div id="passport-upload-box"
+                       onclick="document.getElementById('ret-passport').click()"
+                       style="border:2px dashed #c7d2fe;border-radius:12px;padding:24px;text-align:center;cursor:pointer;background:#f5f3ff;transition:all .2s"
+                       onmouseover="this.style.borderColor='#4338ca';this.style.background='#ede9fe'"
+                       onmouseout="this.style.borderColor='#c7d2fe';this.style.background='#f5f3ff'">
+                    <div id="passport-preview-wrap">
+                      <div style="font-size:2.5rem;margin-bottom:8px">📷</div>
+                      <p style="font-size:13px;font-weight:600;color:#4338ca;margin-bottom:4px">Click to upload passport photo</p>
+                      <p style="font-size:11px;color:var(--muted)">JPG, PNG or WEBP · Max 2MB · Minimum 150×150px</p>
+                    </div>
+                    <img id="passport-img-preview" src="" alt="Passport preview"
+                         style="display:none;width:120px;height:150px;object-fit:cover;border-radius:8px;border:2px solid #4338ca;margin:0 auto">
+                  </div>
+                  <input type="file" id="ret-passport" accept="image/jpeg,image/png,image/webp"
+                         style="display:none" onchange="window.previewPassport(this)">
+                  <div id="passport-upload-error" style="display:none;font-size:12px;color:#dc2626;margin-top:6px"></div>
+                </div>
+
+                <!-- Password preview box -->
+                <div style="background:#f5f3ff;border:1.5px solid #ede9fe;border-radius:10px;padding:14px;margin-bottom:18px">
+                  <p style="font-size:12px;font-weight:700;color:#5b21b6;margin-bottom:6px">🔑 Your Default Password Will Be:</p>
+                  <div id="ret-pass-preview" style="font-family:monospace;font-size:14px;font-weight:800;color:#4338ca;letter-spacing:1px">
+                    Tecohas@[Surname][Last3DigitsOfPhone]
+                  </div>
+                  <p style="font-size:11px;color:#7c3aed;margin-top:6px">Fill your surname and phone above to see your password preview. You can change it after first login.</p>
+                </div>
+
+                <button class="btn btn-primary" style="width:100%;justify-content:center;padding:13px"
+                        onclick="window.submitReturnRegistration()">
+                  📤 Submit Registration
+                </button>
+              </div>
+            </div>
+
+            <!-- LOGIN SECTION -->
+            <div style="background:#fff;border:1.5px solid var(--border);border-radius:14px;padding:24px;box-shadow:var(--shadow)">
+              <h3 style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:4px">🔐 Already Approved? Log In Here</h3>
+              <p style="font-size:13px;color:var(--muted);margin-bottom:18px">Use your email and default password (or your changed password) to access your student dashboard.</p>
+              <div class="form-group" style="margin-bottom:12px">
+                <label>Email Address</label>
+                <input type="email" id="ret-login-email" placeholder="The email you registered with">
+              </div>
+              <div class="form-group" style="margin-bottom:6px">
+                <label>Password</label>
+                <input type="password" id="ret-login-pass" placeholder="Tecohas@[Surname][Last3DigitsOfPhone]">
+              </div>
+              <p style="font-size:11px;color:var(--muted);margin-bottom:16px">Default: <strong>Tecohas@[YourSurname][Last3DigitsOfPhone]</strong></p>
+              <div id="ret-login-error" style="display:none;background:#fee2e2;color:#991b1b;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px"></div>
+              <button class="btn btn-outline" style="width:100%;justify-content:center;padding:13px"
+                      onclick="window.loginReturnStudent()">
+                🎓 Log In & Get Matric Number
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div><!-- /page-returning -->
 
 <!-- =================== CONTACT PAGE =================== -->
 <div class="page" id="page-contact">
@@ -3026,6 +3249,14 @@ document.addEventListener('DOMContentLoaded',function(){
           <span class="nav-icon">📋</span> Applications
           <span class="admin-nav-badge" id="badge-applications">0</span>
         </button>
+        <button class="admin-nav-item" onclick="window.showAdminPanel('returning')">
+          <span class="nav-icon">🎓</span> Returning Students
+          <span class="admin-nav-badge" id="badge-returning">0</span>
+        </button>
+        <button class="admin-nav-item" onclick="window.showAdminPanel('returning')">
+          <span class="nav-icon">🎓</span> Existing Students
+          <span class="admin-nav-badge" id="badge-returning">0</span>
+        </button>
         <button class="admin-nav-item" onclick="window.showAdminPanel('students')">
           <span class="nav-icon">👨‍🎓</span> Students
         </button>
@@ -3152,6 +3383,28 @@ document.addEventListener('DOMContentLoaded',function(){
         </div>
       </div>
 
+      <!-- ── PANEL: RETURNING STUDENTS ── -->
+      <div class="admin-panel" id="panel-returning">
+        <div class="admin-table-wrap">
+          <div class="admin-table-header">
+            <h3>🎓 Returning Student Registrations</h3>
+            <div class="admin-search">
+              <select id="filter-ret-status" onchange="window.loadReturningStudents()"
+                      style="padding:8px 12px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:13px;outline:none;font-family:inherit">
+                <option value="">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+              </select>
+              <input type="text" id="search-returning" placeholder="Search name / program..." oninput="window.loadReturningStudents()">
+            </div>
+          </div>
+          <div id="returning-table-body" style="overflow-x:auto">
+            <div class="admin-loading"><div class="spinner"></div>Loading returning student registrations...</div>
+          </div>
+        </div>
+      </div>
+
       <!-- ── PANEL: STUDENTS ── -->
       <div class="admin-panel" id="panel-students">
         <div class="admin-table-wrap">
@@ -3178,6 +3431,28 @@ document.addEventListener('DOMContentLoaded',function(){
           </div>
           <div id="students-table-body" style="overflow-x:auto">
             <div class="admin-loading"><div class="spinner"></div>Loading students...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PANEL: RETURNING STUDENTS ── -->
+      <div class="admin-panel" id="panel-returning">
+        <div class="admin-table-wrap">
+          <div class="admin-table-header">
+            <h3>🎓 Existing Student Registrations</h3>
+            <div class="admin-search">
+              <select id="filter-ret-status" onchange="window.loadReturningStudents()"
+                      style="padding:8px 12px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:13px;outline:none;font-family:inherit">
+                <option value="">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+              </select>
+              <input type="text" id="search-ret" placeholder="Search name / program..." oninput="window.loadReturningStudents()">
+            </div>
+          </div>
+          <div id="returning-table-body" style="overflow-x:auto">
+            <div class="admin-loading"><div class="spinner"></div>Loading registrations...</div>
           </div>
         </div>
       </div>
@@ -3705,6 +3980,77 @@ window.updateApplicationStatus = async function(id, status) {
 };
 
 // ── Students Panel ─────────────────────────────────────────────────────────
+// ─── Returning Students Admin Panel ─────────────────────────────────────────
+window.loadReturningStudents = async function() {
+  var el = document.getElementById('returning-table-body');
+  if(!el) return;
+  el.innerHTML = '<div class="admin-loading"><div class="spinner"></div>Loading...</div>';
+  var sb = getSB(); if(!sb) return;
+
+  try {
+    var status = document.getElementById('filter-ret-status') ? document.getElementById('filter-ret-status').value : '';
+    var search = document.getElementById('search-returning') ? document.getElementById('search-returning').value : '';
+    var q = sb.from('returning_students').select('*').order('created_at',{ascending:false});
+    if(status) q = q.eq('status', status);
+    if(search) q = q.ilike('full_name','%'+search+'%');
+    var { data, error } = await q;
+    if(error) throw error;
+
+    // Update badge
+    var pendingCount = data ? data.filter(function(d){ return d.status==='pending'; }).length : 0;
+    var badge = document.getElementById('badge-returning');
+    if(badge) badge.textContent = pendingCount || '0';
+
+    if(!data || !data.length){ el.innerHTML = '<div class="admin-empty"><div class="icon">🎓</div><h4>No returning student registrations yet</h4><p>Registrations submitted through the portal will appear here.</p></div>'; return; }
+
+    var rows = data.map(function(s){
+      var date = s.created_at ? new Date(s.created_at).toLocaleDateString('en-NG') : '—';
+      var yr   = s.year_admitted ? '20'+s.year_admitted : '—';
+      return '<tr>'
+        + '<td>'+(s.passport_url ? '<img src="'+s.passport_url+'" style="width:40px;height:50px;object-fit:cover;border-radius:6px;border:2px solid #e5e7eb;cursor:pointer" onclick="window.open(''+s.passport_url+'','_blank')" title="Click to view full photo">' : '<div style="width:40px;height:50px;background:#f1f5f9;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px">👤</div>')+'</td>'
+        + '<td><strong>'+s.full_name+'</strong><br><span style="font-size:11px;color:#64748b">'+s.email+'</span></td>'
+        + '<td>'+s.program+'</td>'
+        + '<td>'+stBadge(s.phase)+'</td>'
+        + '<td><span style="font-size:12px;font-weight:700;color:var(--navy)">'+yr+'</span></td>'
+        + '<td>'+s.session+'</td>'
+        + '<td>'+s.level+'</td>'
+        + '<td>'+(s.prev_ref||'—')+'</td>'
+        + '<td>'+(s.matric_number ? '<code style="font-size:11px;background:#f1f5f9;padding:2px 6px;border-radius:4px">'+s.matric_number+'</code>' : '<span style="color:var(--muted);font-size:12px">Pending</span>')+'</td>'
+        + '<td>'+stBadge(s.status)+'</td>'
+        + '<td><div class="atable-actions">'
+        + (s.status==='pending'
+            ? '<button class="atable-btn approve" onclick="window.approveReturning(''+s.id+'')">✓ Approve</button>'
+            + '<button class="atable-btn reject" onclick="window.rejectReturning(''+s.id+'')">✗ Reject</button>'
+            : '<button class="atable-btn view" onclick="window.showToast(''+s.full_name+' — '+s.status.toUpperCase()+'','')">View</button>')
+        + '</div></td>'
+        + '</tr>';
+    }).join('');
+
+    el.innerHTML = '<table class="atable"><thead><tr>'
+      + '<th>Photo</th><th>Name</th><th>Program</th><th>Phase</th><th>Year Admitted</th>'
+      + '<th>Session</th><th>Level</th><th>Prev. Ref</th><th>Matric No.</th><th>Status</th><th>Actions</th>'
+      + '</tr></thead><tbody>'+rows+'</tbody></table>';
+  } catch(e) { el.innerHTML = '<div class="admin-empty"><div class="icon">⚠️</div><h4>Error loading data</h4><p>'+e.message+'</p></div>'; }
+};
+
+window.approveReturning = async function(id) {
+  var sb = getSB(); if(!sb) return;
+  var { error } = await sb.from('returning_students').update({ status:'approved' }).eq('id', id);
+  if(error){ window.showToast('Error: '+error.message,'error'); return; }
+  window.showToast('✅ Student approved! They can now log in and get their Matric Number.','success');
+  window.loadReturningStudents();
+  window.loadDashboardStats();
+};
+
+window.rejectReturning = async function(id) {
+  var sb = getSB(); if(!sb) return;
+  var { error } = await sb.from('returning_students').update({ status:'rejected' }).eq('id', id);
+  if(error){ window.showToast('Error: '+error.message,'error'); return; }
+  window.showToast('❌ Registration rejected.','error');
+  window.loadReturningStudents();
+};
+
+// ─── Students Panel ─────────────────────────────────────────────────────────
 window.loadStudents = async function() {
   var el = document.getElementById('students-table-body');
   el.innerHTML = '<div class="admin-loading"><div class="spinner"></div>Loading...</div>';
@@ -3888,6 +4234,255 @@ function emptyState(icon, title, msg) {
 }
 
 // end admin JS
+</script>
+
+<!-- ===== RETURNING STUDENT JS ===== -->
+<script>
+(function(){
+
+// ── Password preview ──────────────────────────────────────────────────────
+function updatePassPreview(){
+  var sn = document.getElementById('ret-lastname');
+  var ph = document.getElementById('ret-phone');
+  var pv = document.getElementById('ret-pass-preview');
+  if(!pv) return;
+  var surname = (sn && sn.value.trim()) ? sn.value.trim() : '[Surname]';
+  surname = surname.charAt(0).toUpperCase() + surname.slice(1).toLowerCase();
+  var phone   = (ph && ph.value.trim().length >= 3) ? ph.value.trim().slice(-3) : '[Last3Digits]';
+  pv.textContent = 'Tecohas@' + surname + phone;
+}
+document.addEventListener('DOMContentLoaded', function(){
+  var sn = document.getElementById('ret-lastname');
+  var ph = document.getElementById('ret-phone');
+  if(sn) sn.addEventListener('input', updatePassPreview);
+  if(ph) ph.addEventListener('input', updatePassPreview);
+});
+
+// ── Passport photo preview ────────────────────────────────────────────────
+window.previewPassport = function(input) {
+  var errEl = document.getElementById('passport-upload-error');
+  var img   = document.getElementById('passport-img-preview');
+  var wrap  = document.getElementById('passport-preview-wrap');
+  errEl.style.display = 'none';
+  if(!input.files || !input.files[0]) return;
+  var file = input.files[0];
+  if(file.size > 2 * 1024 * 1024){
+    errEl.textContent = '⚠️ File too large. Please upload a photo under 2MB.';
+    errEl.style.display = 'block';
+    input.value = ''; return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(e){
+    img.src = e.target.result;
+    img.style.display = 'block';
+    wrap.style.display = 'none';
+    var box = document.getElementById('passport-upload-box');
+    if(!document.getElementById('passport-change-btn')){
+      var btn = document.createElement('div');
+      btn.id = 'passport-change-btn';
+      btn.innerHTML = '<button type="button" onclick="event.stopPropagation();document.getElementById('ret-passport').click()" style="margin-top:10px;padding:6px 16px;border:1.5px solid #4338ca;border-radius:6px;background:#fff;color:#4338ca;font-size:12px;font-weight:600;cursor:pointer">🔄 Change Photo</button>';
+      box.appendChild(btn);
+    }
+  };
+  reader.readAsDataURL(file);
+};
+
+// ── Submit Registration ───────────────────────────────────────────────────
+window.submitReturnRegistration = async function() {
+  var fn      = document.getElementById('ret-firstname') ? document.getElementById('ret-firstname').value.trim() : '';
+  var ln      = document.getElementById('ret-lastname')  ? document.getElementById('ret-lastname').value.trim()  : '';
+  var phone   = document.getElementById('ret-phone')     ? document.getElementById('ret-phone').value.trim()     : '';
+  var email   = document.getElementById('ret-email')     ? document.getElementById('ret-email').value.trim()     : '';
+  var program = document.getElementById('ret-program')   ? document.getElementById('ret-program').value          : '';
+  var phase   = document.getElementById('ret-phase')     ? document.getElementById('ret-phase').value            : '';
+  var year    = document.getElementById('ret-year')      ? document.getElementById('ret-year').value             : '';
+  var session = document.getElementById('ret-session')   ? document.getElementById('ret-session').value          : '';
+  var level   = document.getElementById('ret-level')     ? document.getElementById('ret-level').value            : '';
+  var prevRef = document.getElementById('ret-prev-ref')  ? document.getElementById('ret-prev-ref').value.trim()  : '';
+
+  if(!fn||!ln||!phone||!email||!program||!phase||!year||!session||!level){
+    window.showToast('Please fill all required fields.','error'); return;
+  }
+  if(phone.length < 10){ window.showToast('Please enter a valid phone number.','error'); return; }
+
+  // Check passport
+  var passportFile = document.getElementById('ret-passport') ? document.getElementById('ret-passport').files[0] : null;
+  if(!passportFile){
+    window.showToast('Please upload your passport photograph.','error'); return;
+  }
+
+  // Build default password
+  var surname = ln.charAt(0).toUpperCase() + ln.slice(1).toLowerCase();
+  var last3   = phone.slice(-3);
+  var defPass = 'Tecohas@' + surname + last3;
+  var ref     = 'TECOHAS-RET-' + new Date().getFullYear() + '-' + Math.floor(10000 + Math.random()*90000);
+
+  var sb = getSB();
+  if(!sb){ window.showToast('Database not connected.','error'); return; }
+
+  var submitBtn = document.querySelector('#ret-form-body .btn-primary');
+  if(submitBtn){ submitBtn.textContent='⏳ Submitting...'; submitBtn.disabled=true; }
+
+  try {
+    // Upload passport to Supabase Storage
+    var passportUrl = null;
+    try {
+      var safeName = passportFile.name.replace(/[^a-z0-9.]/gi,'_');
+      var filePath = 'passports/' + ref + '_' + safeName;
+      var { data: upData, error: upErr } = await sb.storage
+        .from('student-photos')
+        .upload(filePath, passportFile, { cacheControl:'3600', upsert:false });
+      if(!upErr){
+        var { data: urlData } = sb.storage.from('student-photos').getPublicUrl(filePath);
+        passportUrl = urlData ? urlData.publicUrl : null;
+      } else {
+        console.warn('Passport upload failed:', upErr.message);
+      }
+    } catch(upEx){ console.warn('Storage error:', upEx.message); }
+
+    // Insert record
+    var { error } = await sb.from('returning_students').insert({
+      first_name:   fn,
+      last_name:    ln,
+      full_name:    fn + ' ' + ln,
+      phone,
+      email,
+      program,
+      phase,
+      year_admitted: year,
+      session,
+      level,
+      prev_ref:     prevRef || null,
+      ref_number:   ref,
+      default_pass: defPass,
+      passport_url: passportUrl,
+      status:       'pending'
+    });
+    if(error) throw error;
+
+    // Success message
+    document.getElementById('ret-form-body').innerHTML =
+      '<div style="text-align:center;padding:30px 20px">'
+    + '<div style="font-size:3.5rem;margin-bottom:14px">🎉</div>'
+    + '<h3 style="font-size:18px;font-weight:800;color:var(--navy);margin-bottom:8px">Registration Submitted!</h3>'
+    + '<p style="color:var(--muted);font-size:14px;margin-bottom:20px">The Admissions Officer will review and approve your registration — usually within <strong>24 hours</strong>.</p>'
+    + '<div style="background:var(--light);border-radius:10px;padding:14px 20px;margin-bottom:16px;border:2px solid var(--teal)">'
+    + '<p style="font-size:11px;color:var(--muted);margin-bottom:4px">Your Reference Number</p>'
+    + '<strong style="font-size:1.1rem;color:var(--teal);letter-spacing:2px;font-family:monospace">' + ref + '</strong>'
+    + '</div>'
+    + '<div style="background:#f5f3ff;border:1.5px solid #ede9fe;border-radius:10px;padding:14px 20px;margin-bottom:16px;text-align:left">'
+    + '<p style="font-size:12px;font-weight:700;color:#5b21b6;margin-bottom:6px">🔑 Your Default Login Password</p>'
+    + '<p style="font-family:monospace;font-size:1rem;font-weight:800;color:#4338ca;letter-spacing:1px">' + defPass + '</p>'
+    + '<p style="font-size:11px;color:#7c3aed;margin-top:6px">Save this! Use it to log in after approval. You can change it once logged in.</p>'
+    + '</div>'
+    + (passportUrl ? '<div style="background:#d1fae5;border-radius:8px;padding:10px 14px;font-size:13px;color:#065f46;margin-bottom:16px">📷 Passport photo uploaded successfully ✅</div>' : '<div style="background:#fef3c7;border-radius:8px;padding:10px 14px;font-size:13px;color:#92400e;margin-bottom:16px">⚠️ Passport photo could not be uploaded — please bring a printed copy to the office.</div>')
+    + '<p style="font-size:13px;color:var(--muted)">Use the <strong>Log In</strong> section below after approval.</p>'
+    + '</div>';
+
+    window.showToast('Registration submitted! ✅ Ref: ' + ref,'success');
+  } catch(e) {
+    if(submitBtn){ submitBtn.textContent='📤 Submit Registration'; submitBtn.disabled=false; }
+    window.showToast('Error: ' + (e.message||'Submission failed.'),'error');
+  }
+};
+
+// ── Check Status ──────────────────────────────────────────────────────────
+window.checkReturnStatus = async function() {
+  var val    = document.getElementById('ret-status-input') ? document.getElementById('ret-status-input').value.trim() : '';
+  var result = document.getElementById('ret-status-result');
+  if(!val){ window.showToast('Enter your reference number first.','error'); return; }
+  var sb = getSB(); if(!sb) return;
+  result.style.display = 'block';
+  result.innerHTML = '<div style="text-align:center;padding:10px"><div class="spinner" style="margin:0 auto 8px"></div><span style="font-size:13px;color:var(--muted)">Checking...</span></div>';
+  var { data, error } = await sb.from('returning_students').select('*').eq('ref_number',val).single();
+  if(error||!data){
+    result.innerHTML = '<div style="text-align:center"><strong style="color:var(--red)">No record found</strong><p style="font-size:13px;color:var(--muted);margin-top:6px">Check your reference number and try again.</p></div>';
+    return;
+  }
+  var sColor = data.status==='approved'?'var(--green)':data.status==='rejected'?'var(--red)':'var(--gold)';
+  var sIcon  = data.status==='approved'?'✅':data.status==='rejected'?'❌':'⏳';
+  result.innerHTML =
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px">'
+  + '<div style="background:var(--light);padding:10px;border-radius:8px"><span style="font-size:11px;color:var(--muted)">Name</span><strong style="display:block;color:var(--navy)">'+data.full_name+'</strong></div>'
+  + '<div style="background:var(--light);padding:10px;border-radius:8px"><span style="font-size:11px;color:var(--muted)">Program</span><strong style="display:block;color:var(--navy)">'+data.program+' ('+data.phase+')</strong></div>'
+  + '<div style="background:var(--light);padding:10px;border-radius:8px"><span style="font-size:11px;color:var(--muted)">Year Admitted</span><strong style="display:block;color:var(--navy)">20'+data.year_admitted+'</strong></div>'
+  + '<div style="background:var(--light);padding:10px;border-radius:8px"><span style="font-size:11px;color:var(--muted)">Status</span><strong style="display:block;color:'+sColor+'">'+sIcon+' '+(data.status||'pending').toUpperCase()+'</strong></div>'
+  + '</div>'
+  + (data.status==='approved'?'<div style="margin-top:12px;background:#d1fae5;border-radius:8px;padding:10px 14px;font-size:13px;color:#065f46"><strong>✅ Approved!</strong> Log in below with your email and default password.</div>':'')
+  + (data.status==='rejected'?'<div style="margin-top:12px;background:#fee2e2;border-radius:8px;padding:10px 14px;font-size:13px;color:#991b1b"><strong>❌ Rejected.</strong> Contact the Admissions Office.</div>':'');
+};
+
+// ── Login Returning Student ───────────────────────────────────────────────
+window.loginReturnStudent = async function() {
+  var email = document.getElementById('ret-login-email') ? document.getElementById('ret-login-email').value.trim() : '';
+  var pass  = document.getElementById('ret-login-pass')  ? document.getElementById('ret-login-pass').value.trim()  : '';
+  var errEl = document.getElementById('ret-login-error');
+  errEl.style.display = 'none';
+
+  if(!email||!pass){ errEl.textContent='Please enter your email and password.'; errEl.style.display='block'; return; }
+
+  var loginBtn = document.querySelector('#page-returning .btn-outline');
+  if(loginBtn){ loginBtn.textContent='⏳ Logging in...'; loginBtn.disabled=true; }
+
+  var sb = getSB();
+  if(!sb){ errEl.textContent='Database not connected.'; errEl.style.display='block'; if(loginBtn){loginBtn.textContent='🎓 Log In & Get Matric Number';loginBtn.disabled=false;} return; }
+
+  try {
+    var { data: authData, error: authErr } = await sb.auth.signInWithPassword({ email, password: pass });
+    if(authErr) throw authErr;
+
+    var { data: student, error: stuErr } = await sb.from('returning_students').select('*').eq('email',email).single();
+    if(stuErr||!student) throw new Error('Student record not found. Contact the Admissions Office.');
+    if(student.status !== 'approved') throw new Error('Your registration is not yet approved. Check your status above.');
+
+    // Generate matric if not yet assigned
+    var matric = student.matric_number;
+    if(!matric){
+      var CCODES = {
+        'Community Health':'CH','Orthopedic Cast Technology':'ORT','Paramedics':'PAR',
+        'Health Technician':'HT','Pharmacy Technician':'PHT','Health Assistant':'HA',
+        'Medical Laboratory Technician':'MLT','Environmental Health Technology':'ENT',
+        'Dental Surgery':'DS','Accident and Emergency':'AE','Public Health':'PH'
+      };
+      var code = CCODES[student.program] || 'GEN';
+      var yr   = student.year_admitted || '26';
+      try {
+        var k = 'tecohas_seq_' + code + '_' + yr;
+        var n = parseInt(localStorage.getItem(k)||'0',10) + 1;
+        localStorage.setItem(k, String(n));
+        matric = 'TECOHAS/' + code + '/' + yr + '/' + String(n).padStart(3,'0');
+      } catch(e){ matric = 'TECOHAS/' + code + '/' + yr + '/001'; }
+
+      await sb.from('returning_students').update({ matric_number: matric }).eq('email', email);
+      await sb.from('students').upsert({
+        full_name: student.full_name, email: student.email, phone: student.phone,
+        program: student.program, phase: student.phase, matric_number: matric,
+        ref_number: student.ref_number, session: student.session,
+        student_type: 'returning', status: 'active'
+      }, { onConflict: 'email' });
+    }
+
+    // Update UI and show dashboard
+    appState.applicantName = student.full_name;
+    appState.programChoice = student.program;
+    appState.matricNumber  = matric;
+
+    document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+    var dash = document.getElementById('dashboard');
+    if(dash) dash.classList.add('open');
+    document.getElementById('site-footer').style.display = 'none';
+    window.scrollTo({top:0,behavior:'smooth'});
+    if(typeof setDashDate === 'function') setDashDate();
+
+    window.showToast('Welcome ' + student.first_name + '! 🎓 Your Matric: ' + matric, 'success');
+  } catch(e){
+    errEl.textContent = e.message || 'Login failed. Check your email and password.';
+    errEl.style.display = 'block';
+    if(loginBtn){ loginBtn.textContent='🎓 Log In & Get Matric Number'; loginBtn.disabled=false; }
+  }
+};
+
+})();
 </script>
 
 </body>
