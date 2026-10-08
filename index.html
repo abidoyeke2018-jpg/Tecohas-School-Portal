@@ -2975,14 +2975,67 @@ function setDashDate(){
 
 var currentStep=1;
 window.nextStep=function(n){
-  if(currentStep===1&&n>1){
-    var fn=document.querySelector('#adm-step-1 input[placeholder="Enter first name"]'),ln=document.querySelector('#adm-step-1 input[placeholder="Enter last name"]');
-    if(fn&&ln)appState.applicantName=(fn.value+' '+ln.value).trim()||'Applicant';
-    var em=document.querySelector('#adm-step-1 input[type="email"]'),ph=document.querySelector('#adm-step-1 input[type="tel"]');
-    if(em&&em.value)appState.applicantEmail=em.value.trim();
-    if(ph&&ph.value)appState.applicantPhone=ph.value.trim();
+  // ── Validate before moving FORWARD ────────────────────────────────────────
+  if(n > currentStep) {
+
+    // ── Step 1 Validation: Personal Details ───────────────────────────────
+    if(currentStep===1){
+      var fn  = document.querySelector('#adm-step-1 input[placeholder="Enter first name"]');
+      var ln  = document.querySelector('#adm-step-1 input[placeholder="Enter last name"]');
+      var dob = document.querySelector('#adm-step-1 input[type="date"]');
+      var gen = document.querySelector('#adm-step-1 select');
+      var ph  = document.querySelector('#adm-step-1 input[type="tel"]');
+      var em  = document.querySelector('#adm-step-1 input[type="email"]');
+      var addr= document.querySelector('#adm-step-1 textarea');
+      var st  = document.querySelectorAll('#adm-step-1 select')[1];
+      var lga = document.querySelector('#adm-step-1 input[placeholder="Your LGA"]');
+
+      if(!fn||!fn.value.trim())   { window.showToast('⚠️ First Name is required.','error'); fn&&fn.focus(); return; }
+      if(!ln||!ln.value.trim())   { window.showToast('⚠️ Last Name is required.','error'); ln&&ln.focus(); return; }
+      if(!dob||!dob.value)        { window.showToast('⚠️ Date of Birth is required.','error'); dob&&dob.focus(); return; }
+      if(!gen||!gen.value)        { window.showToast('⚠️ Please select your Gender.','error'); gen&&gen.focus(); return; }
+      if(!ph||!ph.value.trim()||ph.value.trim().length<10){ window.showToast('⚠️ A valid Phone Number is required.','error'); ph&&ph.focus(); return; }
+      if(!em||!em.value.trim()||!em.value.includes('@')){ window.showToast('⚠️ A valid Email Address is required.','error'); em&&em.focus(); return; }
+      if(!addr||!addr.value.trim()){ window.showToast('⚠️ Home Address is required.','error'); addr&&addr.focus(); return; }
+      if(!st||!st.value)          { window.showToast('⚠️ Please select your State of Origin.','error'); st&&st.focus(); return; }
+      if(!lga||!lga.value.trim()) { window.showToast('⚠️ Local Government Area is required.','error'); lga&&lga.focus(); return; }
+
+      // Save to appState
+      appState.applicantName  = (fn.value.trim()+' '+ln.value.trim());
+      appState.applicantEmail = em.value.trim();
+      appState.applicantPhone = ph.value.trim();
+    }
+
+    // ── Step 2 Validation: Academic Records ───────────────────────────────
+    if(currentStep===2){
+      var school = document.querySelector('#adm-step-2 input[placeholder="Name of your secondary school"]');
+      var yr     = document.querySelector('#adm-step-2 input[placeholder="e.g. 2022"]');
+      var subj1  = document.querySelector('#adm-step-2 input[placeholder="e.g. English Language"]');
+      var subj2  = document.querySelector('#adm-step-2 input[placeholder="e.g. Biology"]');
+      var subj3  = document.querySelector('#adm-step-2 input[placeholder="e.g. Chemistry"]');
+
+      if(!school||!school.value.trim()){ window.showToast('⚠️ Secondary School name is required.','error'); school&&school.focus(); return; }
+      if(!yr||!yr.value)               { window.showToast('⚠️ Year of Graduation is required.','error'); yr&&yr.focus(); return; }
+      if(!subj1||!subj1.value.trim())  { window.showToast('⚠️ Please enter at least Subject 1 (e.g. English Language).','error'); subj1&&subj1.focus(); return; }
+      if(!subj2||!subj2.value.trim())  { window.showToast('⚠️ Please enter at least Subject 2 (e.g. Biology).','error'); subj2&&subj2.focus(); return; }
+      if(!subj3||!subj3.value.trim())  { window.showToast('⚠️ Please enter at least Subject 3 (e.g. Chemistry).','error'); subj3&&subj3.focus(); return; }
+    }
+
+    // ── Step 3 Validation: Program Choice ─────────────────────────────────
+    if(currentStep===3){
+      var prog     = document.querySelector('#adm-step-3 select');
+      var passport = document.querySelector('#adm-step-3 input[type="file"]');
+      var olevel   = document.querySelectorAll('#adm-step-3 input[type="file"]')[1];
+
+      if(!prog||!prog.value)                      { window.showToast('⚠️ Please select your Program of Choice.','error'); prog&&prog.focus(); return; }
+      if(!passport||!passport.files||!passport.files[0]){ window.showToast('⚠️ Passport Photograph is required.','error'); return; }
+      if(!olevel||!olevel.files||!olevel.files[0]){ window.showToast('⚠️ O\'Level Certificate scan is required.','error'); return; }
+
+      appState.programChoice = prog.value;
+    }
   }
-  if(currentStep===3&&n>3){var s=document.querySelector('#adm-step-3 select');if(s&&s.value)appState.programChoice=s.value;}
+
+  // ── Navigate to next/prev step ─────────────────────────────────────────
   var ce=document.getElementById('adm-step-'+currentStep),ct=document.getElementById('step-tab-'+currentStep);
   if(ce)ce.style.display='none'; if(ct){ct.classList.remove('active');if(currentStep<n)ct.classList.add('done');}
   currentStep=n;
@@ -3051,32 +3104,67 @@ window.processPayment = function(stageId) {
       logo:        '' // Logo pulled from Flutterwave dashboard
     },
     callback: function(response) {
-      // Called when payment is completed (success or failed)
-      if (response.status === 'successful' || response.status === 'completed') {
+      // ── STRICT payment verification ──────────────────────────────────────
+      // Only mark as paid if Flutterwave explicitly returns 'successful'
+      // Never mark paid on 'pending', 'failed', 'cancelled' or any other status
+      var isSuccessful = (
+        response &&
+        (response.status === 'successful' || response.status === 'completed') &&
+        response.transaction_id &&
+        String(response.transaction_id).length > 0
+      );
+
+      if (isSuccessful) {
         var now = new Date();
         appState.paid[stageId] = {
           date:    now.toLocaleDateString('en-NG', { day:'numeric', month:'short', year:'numeric' }),
-          receipt: response.transaction_id ? String(response.transaction_id) : txRef,
-          txRef:   response.tx_ref || txRef
+          receipt: String(response.transaction_id),
+          txRef:   response.tx_ref || txRef,
+          amount:  stage.amount
         };
 
-        // Check if all required payments are now complete → generate matric
+        // Save payment to Supabase
+        var sb = getSB();
+        if(sb){
+          sb.from('payments').insert({
+            full_name:   appState.applicantName || 'Applicant',
+            student_ref: appState.refNumber || null,
+            stage_id:    stageId,
+            stage_label: stage.label,
+            amount:      stage.amount,
+            tx_ref:      response.tx_ref || txRef,
+            receipt:     String(response.transaction_id),
+            flw_tx_id:   String(response.transaction_id),
+            status:      'paid',
+            program:     appState.programChoice || null,
+            ref_number:  appState.refNumber || null
+          }).then(function(res){
+            if(res.error) console.warn('Payment DB save failed:', res.error.message);
+          });
+        }
+
+        // Check if all required payments done → generate matric
         var allReq = req.every(function(s){ return appState.paid[s.id]; });
         if (allReq && !appState.matricNumber) {
           appState.matricNumber = generateMatricNumber(appState.programChoice || 'Community Health');
           window.showToast('🎓 Matric No. generated: ' + appState.matricNumber, 'success');
         } else {
-          window.showToast('✅ ₦' + stage.amount.toLocaleString() + ' payment confirmed! Ref: ' + (response.transaction_id || txRef), 'success');
+          window.showToast('✅ ₦' + stage.amount.toLocaleString() + ' payment confirmed! Ref: ' + response.transaction_id, 'success');
         }
         window.renderPaymentSection();
+
       } else {
-        window.showToast('⚠️ Payment not completed. Status: ' + (response.status || 'unknown') + '. Please try again.', 'error');
+        // Payment failed, cancelled, or returned unknown status — do NOT mark paid
+        appState.paid[stageId] = undefined; // ensure not marked
+        var statusMsg = response ? (response.status || 'unknown') : 'no response';
+        window.showToast('❌ Payment was NOT successful (Status: ' + statusMsg + '). No charge has been recorded. Please try again.', 'error');
       }
     },
     onclose: function() {
-      // User closed the payment modal without completing
+      // ── User closed modal without completing payment ──────────────────────
+      // NEVER mark as paid here — just inform the user
       if (!appState.paid[stageId]) {
-        window.showToast('Payment window closed. Click "Pay Now" to try again.', '');
+        window.showToast('⚠️ Payment cancelled — you have NOT been charged. Click "Pay Now" to try again.', 'error');
       }
     }
   });
