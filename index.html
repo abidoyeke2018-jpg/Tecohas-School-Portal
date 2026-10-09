@@ -1210,7 +1210,7 @@ table.atable tr:hover td { background:#f8fafc; }
     </ul>
     <div class="nav-actions">
       <button class="btn btn-outline btn-sm" onclick="openLogin()">Portal Login</button>
-      <button class="btn btn-sm btn-admin" style="background:#4338ca;color:#fff;border-color:#4338ca;cursor:pointer" onclick="(function(){ var o=document.getElementById('admin-login-overlay'); if(o){o.style.display='flex';o.classList.add('open');}else{alert('Reload the page and try again');} })()">🔐 Admin</button>
+      <button class="btn btn-sm btn-admin" style="background:#4338ca;color:#fff;border-color:#4338ca;cursor:pointer" onclick="window.openAdminLogin()">🔐 Admin</button>
     </div>
     <button id="hamburger" aria-label="Toggle menu" aria-expanded="false" onclick="toggleMobile()">
       <span></span><span></span><span></span>
@@ -3933,7 +3933,20 @@ document.addEventListener('DOMContentLoaded',function(){
 
 <!-- ===== ADMIN + SUPABASE JS ===== -->
 <script>
-// ── ADMIN CREDENTIALS (works without Supabase) ─────────────────────────────
+// ════════════════════════════════════════════════════════════
+// TECOHAS ADMIN PORTAL — Complete JS (No IIFEs)
+// ════════════════════════════════════════════════════════════
+
+// ── Supabase ─────────────────────────────────────────────────
+var SUPA_URL  = 'https://voflakuiebjhqygvgztk.supabase.co';
+var SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvZmxha3VpZWJqaHF5Z3ZnenRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1MDA0NTYsImV4cCI6MjEwNTA3NjQ1Nn0.T9rz9yYmsytabDpML-MoWwNvv7jslBdvkwDlbQRX8ks';
+var _sb = null;
+function getSB() {
+  if (!_sb && window.supabase) _sb = window.supabase.createClient(SUPA_URL, SUPA_ANON);
+  return _sb;
+}
+
+// ── Admin Credentials ─────────────────────────────────────────
 var ADMIN_CREDENTIALS = {
   'tabukgmodel@gmail.com':     { password: 'Tecohas@SuperAdmin7741', role: 'super_admin', name: 'Akinwumi Tabitha Bukola'  },
   'arthurtemi@gmail.com':      { password: 'Tecohas@Academic3829',   role: 'academic',    name: 'TECOHAS Academic Officer' },
@@ -3948,10 +3961,13 @@ var ROLE_LABELS = {
   academic:    '🎓 Academic Officer'
 };
 
+var _adminSession = null;
+
+// ── Open / Close Login Modal ──────────────────────────────────
 window.openAdminLogin = function() {
   var o = document.getElementById('admin-login-overlay');
   if (o) { o.style.display = 'flex'; o.classList.add('open'); }
-  setTimeout(function(){ var e = document.getElementById('admin-email'); if(e) e.focus(); }, 100);
+  setTimeout(function(){ var e = document.getElementById('admin-email'); if(e) e.focus(); }, 150);
 };
 
 window.closeAdminLogin = function() {
@@ -3959,6 +3975,7 @@ window.closeAdminLogin = function() {
   if (o) { o.style.display = 'none'; o.classList.remove('open'); }
 };
 
+// ── Login ─────────────────────────────────────────────────────
 window.doAdminLogin = function() {
   var emailEl = document.getElementById('admin-email');
   var passEl  = document.getElementById('admin-password');
@@ -3968,7 +3985,7 @@ window.doAdminLogin = function() {
   if (errEl) errEl.style.display = 'none';
 
   var email = emailEl ? emailEl.value.trim().toLowerCase() : '';
-  var pass  = passEl  ? passEl.value.trim()                : '';
+  var pass  = passEl  ? passEl.value                       : '';
 
   if (!email || !pass) {
     if (errEl) { errEl.textContent = 'Please enter your email and password.'; errEl.style.display = 'block'; }
@@ -3980,7 +3997,7 @@ window.doAdminLogin = function() {
   var cred = ADMIN_CREDENTIALS[email];
 
   if (!cred) {
-    if (errEl) { errEl.textContent = 'This email is not registered as an admin.'; errEl.style.display = 'block'; }
+    if (errEl) { errEl.textContent = 'Email not found. Contact the Super Admin.'; errEl.style.display = 'block'; }
     if (btn)   { btn.textContent = '🔐 Sign In to Admin Portal'; btn.disabled = false; }
     return;
   }
@@ -3991,586 +4008,375 @@ window.doAdminLogin = function() {
     return;
   }
 
-  // ── Credentials valid — launch dashboard ────────────────────────────────
-  window._adminSession = { loggedIn: true, role: cred.role, email: email, name: cred.name };
+  _adminSession = { loggedIn: true, role: cred.role, email: email, name: cred.name };
 
   setTimeout(function() {
+    if (btn) { btn.textContent = '🔐 Sign In to Admin Portal'; btn.disabled = false; }
     window.closeAdminLogin();
     window.launchAdminDashboard();
-    if (btn) { btn.textContent = '🔐 Sign In to Admin Portal'; btn.disabled = false; }
   }, 300);
 };
 
+// ── Launch Dashboard ──────────────────────────────────────────
 window.launchAdminDashboard = function() {
-  var cred = window._adminSession;
-  if (!cred || !cred.loggedIn) return;
+  if (!_adminSession || !_adminSession.loggedIn) return;
+  var cred = _adminSession;
 
-  // Hide all student pages
   document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
   var sd = document.getElementById('dashboard'); if (sd) sd.classList.remove('open');
   var footer = document.getElementById('site-footer'); if (footer) footer.style.display = 'none';
-  var navbar = document.getElementById('main-navbar'); if (navbar) navbar.style.display = 'none';
 
-  // Show admin dashboard
   var ad = document.getElementById('admin-dashboard');
-  if (ad) { ad.style.display = 'block'; ad.classList.add('open'); }
+  if (!ad) { alert('Admin dashboard element not found. Please reload the page.'); return; }
+  ad.style.display = 'block';
+  ad.classList.add('open');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  // Set display values
   var roleLabel = ROLE_LABELS[cred.role] || cred.role;
-  var initials  = cred.name.split(' ').map(function(w){ return w[0]; }).join('').toUpperCase().slice(0, 2);
+  var initials  = cred.name.split(' ').map(function(w){ return w[0]; }).join('').toUpperCase().slice(0,2);
 
   function setEl(id, val) { var e = document.getElementById(id); if (e) e.textContent = val; }
-  setEl('admin-role-display',   roleLabel);
-  setEl('admin-role-tag',       roleLabel);
-  setEl('admin-name-display',   cred.name);
-  setEl('admin-email-display',  cred.email);
-  setEl('admin-avatar-initials',initials);
-  setEl('admin-avatar-bar',     initials);
+  setEl('admin-role-display',    roleLabel);
+  setEl('admin-role-tag',        roleLabel);
+  setEl('admin-name-display',    cred.name);
+  setEl('admin-email-display',   cred.email);
+  setEl('admin-avatar-initials', initials);
+  setEl('admin-avatar-bar',      initials);
 
-  // Mobile toggle
   var mob = document.getElementById('admin-mob-toggle');
   if (mob) mob.style.display = 'flex';
 
   // Role-based nav
-  var navMap = {
+  var navAll = ['applications','returning','students','payments','results','staff','settings'];
+  var navMap  = {
     super_admin: ['applications','returning','students','payments','results','staff','settings'],
     admissions:  ['applications','returning','students'],
     bursary:     ['payments','students'],
     academic:    ['results','students']
   };
   var allowed = navMap[cred.role] || [];
-
-  // Hide all nav items first
-  ['applications','returning','students','payments','results','staff','settings'].forEach(function(panel) {
+  navAll.forEach(function(panel) {
     var btn = document.querySelector('button[onclick="window.showAdminPanel(''+panel+'')"]');
-    if (btn) btn.style.display = 'none';
-  });
-  // Show only allowed
-  allowed.forEach(function(panel) {
-    var btn = document.querySelector('button[onclick="window.showAdminPanel(''+panel+'')"]');
-    if (btn) btn.style.display = 'flex';
+    if (btn) btn.style.display = allowed.indexOf(panel) !== -1 ? 'flex' : 'none';
   });
 
-  // Load dashboard
   window.showAdminPanel('dashboard');
   window.loadDashboardStats();
 };
 
+// ── Logout ────────────────────────────────────────────────────
 window.adminLogout = function() {
+  _adminSession = null;
   var ad = document.getElementById('admin-dashboard');
   if (ad) { ad.style.display = 'none'; ad.classList.remove('open'); }
   var footer = document.getElementById('site-footer'); if (footer) footer.style.display = '';
-  var navbar = document.getElementById('main-navbar'); if (navbar) navbar.style.display = '';
-  window._adminSession = null;
   window.showPage('home');
-  window.showToast('Logged out of admin portal.', '');
+  window.showToast('You have been logged out.', '');
 };
 
-
-// ── Supabase config ────────────────────────────────────────────────────────
-const SUPA_URL  = 'https://voflakuiebjhqygvgztk.supabase.co';
-const SUPA_ANON = 'sb_publishable_rPsfgR_sJo4BbovarKxiUg_60JWpwJp';
-
-let _sb = null;
-function getSB() {
-  if (!_sb) {
-    _sb = window.supabase ? window.supabase.createClient(SUPA_URL, SUPA_ANON) : null;
-  }
-  return _sb;
-}
-
-// ── Admin session state ────────────────────────────────────────────────────
-let adminSession = {
-  loggedIn: false,
-  role:     null,
-  email:    null,
-  name:     null
-};
-let _currentAppId = null;
-window._currentAppId = null;
-
-// Role labels + icons
-const ROLE_META = {
-  super_admin: { label: '👑 Super Admin',       tag: 'super_admin' },
-  admissions:  { label: '📋 Admissions Officer', tag: 'admissions'  },
-  bursary:     { label: '💰 Bursary Officer',    tag: 'bursary'     },
-  academic:    { label: '🎓 Academic Officer',   tag: 'academic'    }
-};
-let selectedAdminRole = 'super_admin';
-
-// ── Admin Login modal ──────────────────────────────────────────────────────
-
-
-
+// ── Panel Navigation ──────────────────────────────────────────
 window.showAdminPanel = function(panelId) {
   document.querySelectorAll('.admin-panel').forEach(function(p){ p.classList.remove('active'); });
   document.querySelectorAll('.admin-nav-item').forEach(function(b){ b.classList.remove('active'); });
-
   var panel = document.getElementById('panel-' + panelId);
   if (panel) panel.classList.add('active');
-
-  var navBtn = null; try { navBtn = document.querySelector('button[onclick*="' + panelId + '"]'); } catch(e){}
+  var navBtn = document.querySelector('button[onclick="window.showAdminPanel(''+panelId+'')"]');
   if (navBtn) navBtn.classList.add('active');
-
   var titles = {
-    dashboard:    ['Dashboard Overview', 'Welcome back — here is what is happening today'],
-    applications: ['Applications — 2026/2027', 'Review, approve or reject admission applications'],
-    students:     ['Registered Students', 'View and manage all enrolled students'],
-    payments:     ['Payment Records', 'Track all fee payments and outstanding balances'],
-    results:      ['Student Results', 'Upload and manage academic results'],
-    staff:        ['Staff Accounts', 'Create and manage admin staff accounts'],
-    settings:     ['Portal Settings', 'Configure fees, session, and portal options']
+    dashboard:    ['Dashboard Overview',          "Welcome back"],
+    applications: ['Applications — 2026/2027',    'Review, approve or reject applications'],
+    returning:    ['Returning Student Registrations','Review self-registrations'],
+    students:     ['Registered Students',          'View all enrolled students'],
+    payments:     ['Payment Records',              'Track all fee payments'],
+    results:      ['Student Results',              'Upload and manage academic results'],
+    staff:        ['Staff Accounts',               'Manage admin staff accounts'],
+    settings:     ['Portal Settings',              'Configure fees and session options']
   };
-  var t = titles[panelId] || ['Admin Portal', ''];
-  document.getElementById('admin-panel-title').textContent = t[0];
-  document.getElementById('admin-panel-sub').textContent   = t[1];
-
-  // Load data for the panel
+  var t = titles[panelId] || ['Admin Portal',''];
+  var titleEl = document.getElementById('admin-panel-title');
+  var subEl   = document.getElementById('admin-panel-sub');
+  if (titleEl) titleEl.textContent = t[0];
+  if (subEl)   subEl.textContent   = t[1];
   if (panelId === 'applications') window.loadApplications();
+  if (panelId === 'returning')    window.loadReturningStudents();
   if (panelId === 'students')     window.loadStudents();
   if (panelId === 'payments')     window.loadPayments();
   if (panelId === 'results')      window.loadResults();
   if (panelId === 'staff')        window.loadStaff();
 };
 
-// ── DB Helpers ─────────────────────────────────────────────────────────────
-async function dbQuery(table, options) {
-  var sb = getSB(); if (!sb) return { data: [], error: 'No DB' };
-  var q = sb.from(table).select(options.select || '*');
-  if (options.eq)     q = q.eq(options.eq[0], options.eq[1]);
-  if (options.filter) options.filter.forEach(function(f){ if(f[1]) q = q.eq(f[0], f[1]); });
-  if (options.ilike)  q = q.ilike(options.ilike[0], '%' + options.ilike[1] + '%');
-  if (options.or)     q = q.or(options.or);
-  if (options.order)  q = q.order(options.order, { ascending: false });
-  if (options.limit)  q = q.limit(options.limit);
-  return q;
-}
-
+// ── Helpers ───────────────────────────────────────────────────
 function fmt(num) { return num ? Number(num).toLocaleString() : '0'; }
 function stBadge(s) {
-  var map = { pending:'st-pending',approved:'st-approved',rejected:'st-rejected',
-              paid:'st-paid',unpaid:'st-unpaid',ND:'st-nd',HND:'st-hnd' };
-  return '<span class="st-badge ' + (map[s]||'st-pending') + '">' + (s||'—') + '</span>';
+  var map = { pending:'st-pending',approved:'st-approved',rejected:'st-rejected',paid:'st-paid',unpaid:'st-unpaid',ND:'st-nd',HND:'st-hnd' };
+  return '<span class="st-badge '+(map[s]||'st-pending')+'">'+(s||'—')+'</span>';
+}
+function emptyState(icon,title,msg) {
+  return '<div class="admin-empty"><div class="icon">'+icon+'</div><h4>'+title+'</h4><p>'+msg+'</p></div>';
 }
 
-// ── Dashboard Stats ────────────────────────────────────────────────────────
+// ── Dashboard Stats ───────────────────────────────────────────
 window.loadDashboardStats = async function() {
-  var sb = getSB(); if (!sb) return showAdminFallback();
-
+  var sb = getSB();
+  if (!sb) { showFallbackStats(); return; }
   try {
-    // Applications count
-    var { count: appCount } = await sb.from('applications').select('*', {count:'exact',head:true});
-    var { count: admCount } = await sb.from('applications').select('*', {count:'exact',head:true}).eq('status','approved');
-    var { count: penCount } = await sb.from('applications').select('*', {count:'exact',head:true}).eq('status','pending');
-    var { data: payData }   = await sb.from('payments').select('amount').eq('status','paid');
-
-    var totalRev = payData ? payData.reduce(function(s,p){ return s + (p.amount||0); }, 0) : 0;
-
-    document.getElementById('stat-applications').textContent = fmt(appCount);
-    document.getElementById('stat-admitted').textContent     = fmt(admCount);
-    document.getElementById('stat-revenue').textContent      = '₦' + fmt(totalRev);
-    document.getElementById('stat-pending').textContent      = fmt(penCount);
-    document.getElementById('badge-applications').textContent = penCount || 0;
-
-    // Recent apps
-    var { data: recentApps } = await sb.from('applications')
-      .select('id,full_name,program,phase,status,created_at').order('created_at',{ascending:false}).limit(5);
-    renderRecentApps(recentApps || []);
-
-    // Recent payments
-    var { data: recentPays } = await sb.from('payments')
-      .select('full_name,stage_label,amount,status,created_at').order('created_at',{ascending:false}).limit(5);
-    renderRecentPayments(recentPays || []);
-
-  } catch(e) { showAdminFallback(); }
+    var r1 = await sb.from('applications').select('*',{count:'exact',head:true});
+    var r2 = await sb.from('applications').select('*',{count:'exact',head:true}).eq('status','approved');
+    var r3 = await sb.from('applications').select('*',{count:'exact',head:true}).eq('status','pending');
+    var r4 = await sb.from('payments').select('amount').eq('status','paid');
+    var totalRev = r4.data ? r4.data.reduce(function(s,p){ return s+(p.amount||0); },0) : 0;
+    function setEl(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; }
+    setEl('stat-applications', fmt(r1.count));
+    setEl('stat-admitted',     fmt(r2.count));
+    setEl('stat-revenue',      '₦'+fmt(totalRev));
+    setEl('stat-pending',      fmt(r3.count));
+    var badge = document.getElementById('badge-applications');
+    if (badge) badge.textContent = r3.count || '0';
+    var ra = await sb.from('applications').select('id,full_name,program,phase,status,created_at').order('created_at',{ascending:false}).limit(5);
+    renderRecentApps(ra.data || []);
+    var rp = await sb.from('payments').select('full_name,stage_label,amount,status,created_at').order('created_at',{ascending:false}).limit(5);
+    renderRecentPayments(rp.data || []);
+  } catch(e) { showFallbackStats(); }
 };
+
+function showFallbackStats() {
+  ['stat-applications','stat-admitted','stat-pending'].forEach(function(id){ var e=document.getElementById(id); if(e) e.textContent='—'; });
+  var rev = document.getElementById('stat-revenue'); if(rev) rev.textContent='—';
+  var ra = document.getElementById('dash-recent-apps');
+  var rp = document.getElementById('dash-recent-payments');
+  if(ra) ra.innerHTML = emptyState('⚠️','Database not yet set up','Run the SQL setup script in Supabase to enable live data.');
+  if(rp) rp.innerHTML = emptyState('⚠️','Database not yet set up','Run the SQL setup script in Supabase to enable live data.');
+}
 
 function renderRecentApps(apps) {
   var el = document.getElementById('dash-recent-apps');
-  if (!apps.length) { el.innerHTML = emptyState('📋','No applications yet','Applications submitted through the portal will appear here.'); return; }
+  if (!el) return;
+  if (!apps.length) { el.innerHTML = emptyState('📋','No applications yet','Applications will appear here once submitted.'); return; }
   var rows = apps.map(function(a){
-    return '<tr>'
-      + '<td><strong>' + (a.full_name||'—') + '</strong></td>'
-      + '<td>' + (a.program||'—') + '</td>'
-      + '<td>' + stBadge(a.phase) + '</td>'
-      + '<td>' + stBadge(a.status) + '</td>'
-      + '<td><button class="atable-btn view" onclick="window.viewApplication(this.dataset.appid)" data-appid=\'' + a.id + '\'">View</button></td>'
-      + '</tr>';
+    return '<tr><td><strong>'+(a.full_name||'—')+'</strong></td><td>'+(a.program||'—')+'</td><td>'+stBadge(a.phase)+'</td><td>'+stBadge(a.status)+'</td><td><button class="atable-btn view" onclick="window.viewApplication(''+a.id+'')">View</button></td></tr>';
   }).join('');
-  el.innerHTML = '<table class="atable"><thead><tr><th>Name</th><th>Program</th><th>Phase</th><th>Status</th><th>Action</th></tr></thead><tbody>' + rows + '</tbody></table>';
+  el.innerHTML = '<table class="atable"><thead><tr><th>Name</th><th>Program</th><th>Phase</th><th>Status</th><th>Action</th></tr></thead><tbody>'+rows+'</tbody></table>';
 }
 
 function renderRecentPayments(pays) {
   var el = document.getElementById('dash-recent-payments');
-  if (!pays.length) { el.innerHTML = emptyState('💰','No payments yet','Payments will appear here once students start paying.'); return; }
+  if (!el) return;
+  if (!pays.length) { el.innerHTML = emptyState('💰','No payments yet','Payments will appear here once students pay.'); return; }
   var rows = pays.map(function(p){
-    return '<tr>'
-      + '<td><strong>' + (p.full_name||'—') + '</strong></td>'
-      + '<td>' + (p.stage_label||'—') + '</td>'
-      + '<td>₦' + fmt(p.amount) + '</td>'
-      + '<td>' + stBadge(p.status) + '</td>'
-      + '</tr>';
+    return '<tr><td><strong>'+(p.full_name||'—')+'</strong></td><td>'+(p.stage_label||'—')+'</td><td>₦'+fmt(p.amount)+'</td><td>'+stBadge(p.status)+'</td></tr>';
   }).join('');
-  el.innerHTML = '<table class="atable"><thead><tr><th>Name</th><th>Type</th><th>Amount</th><th>Status</th></tr></thead><tbody>' + rows + '</tbody></table>';
+  el.innerHTML = '<table class="atable"><thead><tr><th>Name</th><th>Type</th><th>Amount</th><th>Status</th></tr></thead><tbody>'+rows+'</tbody></table>';
 }
 
-// ── Applications Panel ─────────────────────────────────────────────────────
+// ── Applications ──────────────────────────────────────────────
 window.loadApplications = async function() {
   var el = document.getElementById('applications-table-body');
+  if (!el) return;
   el.innerHTML = '<div class="admin-loading"><div class="spinner"></div>Loading...</div>';
-  var sb = getSB(); if (!sb) { el.innerHTML = emptyState('⚠️','DB Error','Could not connect to database.'); return; }
-
+  var sb = getSB();
+  if (!sb) { el.innerHTML = emptyState('⚠️','DB not connected','Connect Supabase to view applications.'); return; }
   try {
-    var phase   = document.getElementById('filter-phase')   ? document.getElementById('filter-phase').value   : '';
-    var status  = document.getElementById('filter-status')  ? document.getElementById('filter-status').value  : '';
-    var search  = document.getElementById('search-apps')    ? document.getElementById('search-apps').value    : '';
-
+    var phase  = document.getElementById('filter-phase')  ? document.getElementById('filter-phase').value  : '';
+    var status = document.getElementById('filter-status') ? document.getElementById('filter-status').value : '';
+    var search = document.getElementById('search-apps')   ? document.getElementById('search-apps').value   : '';
     var q = sb.from('applications').select('*').order('created_at',{ascending:false});
-    if (phase)  q = q.eq('phase', phase);
-    if (status) q = q.eq('status', status);
-    if (search) q = q.ilike('full_name','%' + search + '%');
-
-    var { data, error } = await q;
-    if (error) throw error;
-    if (!data || !data.length) { el.innerHTML = emptyState('📋','No applications found','Try adjusting your filters.'); return; }
-
-    var rows = data.map(function(a){
+    if (phase)  q = q.eq('phase',phase);
+    if (status) q = q.eq('status',status);
+    if (search) q = q.ilike('full_name','%'+search+'%');
+    var res = await q;
+    if (!res.data || !res.data.length) { el.innerHTML = emptyState('📋','No applications found','Try adjusting your filters.'); return; }
+    var rows = res.data.map(function(a){
       var date = a.created_at ? new Date(a.created_at).toLocaleDateString('en-NG') : '—';
-      return '<tr>'
-        + '<td><strong>' + (a.full_name||'—') + '</strong><br><span style="font-size:11px;color:#64748b">' + (a.email||'') + '</span></td>'
-        + '<td>' + (a.program||'—') + '</td>'
-        + '<td>' + stBadge(a.phase) + '</td>'
-        + '<td>' + (a.ref_number||'—') + '</td>'
-        + '<td>' + stBadge(a.status) + '</td>'
-        + '<td>' + date + '</td>'
-        + '<td><div class="atable-actions">'
-        + '<button class="atable-btn view" onclick="window.viewApplication(this.dataset.appid)" data-appid=\'' + a.id + '\'">View</button>'
-        + (a.status==='pending' ? '<button class="atable-btn approve" onclick="window.updateApplicationStatus(this.dataset.appid,\"approved\")" data-appid=\'' + a.id + '\'>&#10003; Approve</button> <button class="atable-btn reject" onclick="window.updateApplicationStatus(this.dataset.appid,\"rejected\")" data-appid=\'' + a.id + '\'>&#10007; Reject</button>' : '')
-        + '</div></td>'
-        + '</tr>';
+      return '<tr><td><strong>'+(a.full_name||'—')+'</strong><br><span style="font-size:11px;color:#64748b">'+(a.email||'')+'</span></td><td>'+(a.program||'—')+'</td><td>'+stBadge(a.phase)+'</td><td>'+(a.ref_number||'—')+'</td><td>'+stBadge(a.status)+'</td><td>'+date+'</td><td><div class="atable-actions"><button class="atable-btn view" onclick="window.viewApplication(''+a.id+'')">View</button>'+(a.status==='pending'?'<button class="atable-btn approve" onclick="window.updateApplicationStatus(''+a.id+'','approved')">✓</button><button class="atable-btn reject" onclick="window.updateApplicationStatus(''+a.id+'','rejected')">✗</button>':'')+'</div></td></tr>';
     }).join('');
-
-    el.innerHTML = '<table class="atable"><thead><tr><th>Applicant</th><th>Program</th><th>Phase</th><th>Ref No.</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>' + rows + '</tbody></table>';
-  } catch(e) { el.innerHTML = emptyState('⚠️','Error loading applications', e.message); }
+    el.innerHTML = '<table class="atable"><thead><tr><th>Applicant</th><th>Program</th><th>Phase</th><th>Ref No.</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  } catch(e) { el.innerHTML = emptyState('⚠️','Error loading',''+e.message); }
 };
 
 window.viewApplication = async function(id) {
   window._currentAppId = id;
   var modal = document.getElementById('app-detail-modal');
   var body  = document.getElementById('app-detail-body');
-  modal.classList.add('open'); body.innerHTML = '<div class="admin-loading"><div class="spinner"></div>Loading...</div>';
-
+  if (!modal || !body) return;
+  modal.classList.add('open');
+  body.innerHTML = '<div class="admin-loading"><div class="spinner"></div>Loading...</div>';
   var sb = getSB(); if (!sb) return;
-  var { data } = await sb.from('applications').select('*').eq('id', id).single();
-  if (!data) { body.innerHTML = '<p>Could not load application.</p>'; return; }
-
-  body.innerHTML =
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px">'
-  + field('Full Name',   data.full_name)
-  + field('Email',       data.email)
-  + field('Phone',       data.phone)
-  + field('Date of Birth', data.dob)
-  + field('State of Origin', data.state_of_origin)
-  + field('LGA',         data.lga)
-  + field('Program',     data.program)
-  + field('Phase',       data.phase)
-  + field("O'Level",    data.olevel_summary)
-  + field('JAMB Score',  data.jamb_score || 'N/A')
-  + field('Ref Number',  data.ref_number)
-  + field('Status',      data.status)
-  + field('Applied On',  data.created_at ? new Date(data.created_at).toLocaleDateString('en-NG') : '—')
-  + '</div>';
+  var res = await sb.from('applications').select('*').eq('id',id).single();
+  if (!res.data) { body.innerHTML = '<p>Could not load application.</p>'; return; }
+  var d = res.data;
+  function field(label,val){ return '<div style="background:#f8fafc;padding:10px;border-radius:8px"><span style="font-size:11px;color:#64748b">'+label+'</span><strong style="display:block;color:#1e1b4b;margin-top:2px">'+(val||'—')+'</strong></div>'; }
+  body.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px">'+field('Full Name',d.full_name)+field('Email',d.email)+field('Phone',d.phone)+field('DOB',d.dob)+field('State',d.state_of_origin)+field('LGA',d.lga)+field('Program',d.program)+field('Phase',d.phase)+field('Ref Number',d.ref_number)+field('Status',d.status)+field('Applied On',d.created_at?new Date(d.created_at).toLocaleDateString('en-NG'):'—')+'</div>';
 };
-
-function field(label, val) {
-  return '<div style="background:#f8fafc;padding:10px;border-radius:8px"><span style="font-size:11px;color:#64748b">' + label + '</span><strong style="display:block;color:#1e1b4b;margin-top:2px">' + (val||'—') + '</strong></div>';
-}
 
 window.updateApplicationStatus = async function(id, status) {
   var sb = getSB(); if (!sb) return;
-  var { error } = await sb.from('applications').update({ status }).eq('id', id);
-  if (error) { window.showToast('Error: ' + error.message, 'error'); return; }
-
-  // If approved, also create student record
+  var res = await sb.from('applications').update({status}).eq('id',id);
+  if (res.error) { window.showToast('Error: '+res.error.message,'error'); return; }
   if (status === 'approved') {
-    var { data: app } = await sb.from('applications').select('*').eq('id', id).single();
-    if (app) {
-      await sb.from('students').upsert({
-        full_name:   app.full_name,
-        email:       app.email,
-        phone:       app.phone,
-        program:     app.program,
-        phase:       app.phase,
-        ref_number:  app.ref_number,
-        session:     '2026/2027',
-        matric_number: null, // assigned after full payment
-        status:      'admitted'
-      }, { onConflict: 'ref_number' });
+    var app = await sb.from('applications').select('*').eq('id',id).single();
+    if (app.data) {
+      await sb.from('students').upsert({ full_name:app.data.full_name, email:app.data.email, phone:app.data.phone, program:app.data.program, phase:app.data.phase, ref_number:app.data.ref_number, session:'2026/2027', status:'admitted' },{ onConflict:'ref_number' });
     }
   }
-
   document.getElementById('app-detail-modal').classList.remove('open');
-  window.showToast(status === 'approved' ? '✅ Application approved! Student record created.' : '❌ Application rejected.', status === 'approved' ? 'success' : 'error');
+  window.showToast(status==='approved'?'✅ Application approved!':'❌ Application rejected.', status==='approved'?'success':'error');
   window.loadApplications();
   window.loadDashboardStats();
 };
 
-// ── Students Panel ─────────────────────────────────────────────────────────
-// ─── Returning Students Admin Panel ─────────────────────────────────────────
+// ── Returning Students ────────────────────────────────────────
 window.loadReturningStudents = async function() {
   var el = document.getElementById('returning-table-body');
-  if(!el) return;
+  if (!el) return;
   el.innerHTML = '<div class="admin-loading"><div class="spinner"></div>Loading...</div>';
-  var sb = getSB(); if(!sb) return;
-
+  var sb = getSB(); if (!sb) { el.innerHTML = emptyState('⚠️','DB not connected',''); return; }
   try {
     var status = document.getElementById('filter-ret-status') ? document.getElementById('filter-ret-status').value : '';
-    var search = document.getElementById('search-returning') ? document.getElementById('search-returning').value : '';
+    var search = document.getElementById('search-returning')  ? document.getElementById('search-returning').value  : '';
     var q = sb.from('returning_students').select('*').order('created_at',{ascending:false});
-    if(status) q = q.eq('status', status);
-    if(search) q = q.ilike('full_name','%'+search+'%');
-    var { data, error } = await q;
-    if(error) throw error;
-
-    // Update badge
-    var pendingCount = data ? data.filter(function(d){ return d.status==='pending'; }).length : 0;
-    var badge = document.getElementById('badge-returning');
-    if(badge) badge.textContent = pendingCount || '0';
-
-    if(!data || !data.length){ el.innerHTML = '<div class="admin-empty"><div class="icon">🎓</div><h4>No returning student registrations yet</h4><p>Registrations submitted through the portal will appear here.</p></div>'; return; }
-
-    var rows = data.map(function(s){
-      var date = s.created_at ? new Date(s.created_at).toLocaleDateString('en-NG') : '—';
-      var yr   = s.year_admitted ? '20'+s.year_admitted : '—';
-      return '<tr>'
-        + '<td>'+(s.passport_url ? '<img src="'+s.passport_url+'" style="width:40px;height:50px;object-fit:cover;border-radius:6px;border:2px solid #e5e7eb;cursor:pointer" onclick="window.open(''+s.passport_url+'','_blank')" title="Click to view full photo">' : '<div style="width:40px;height:50px;background:#f1f5f9;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px">👤</div>')+'</td>'
-        + '<td><strong>'+s.full_name+'</strong><br><span style="font-size:11px;color:#64748b">'+s.email+'</span></td>'
-        + '<td>'+s.program+'</td>'
-        + '<td>'+stBadge(s.phase)+'</td>'
-        + '<td><span style="font-size:12px;font-weight:700;color:var(--navy)">'+yr+'</span></td>'
-        + '<td>'+s.session+'</td>'
-        + '<td>'+s.level+'</td>'
-        + '<td>'+(s.prev_ref||'—')+'</td>'
-        + '<td>'+(s.matric_number ? '<code style="font-size:11px;background:#f1f5f9;padding:2px 6px;border-radius:4px">'+s.matric_number+'</code>' : '<span style="color:var(--muted);font-size:12px">Pending</span>')+'</td>'
-        + '<td>'+stBadge(s.status)+'</td>'
-        + '<td><div class="atable-actions">'
-        + (s.status==='pending'
-            ? '<button class="atable-btn approve" onclick="window.approveReturning(''+s.id+'')">✓ Approve</button>'
-            + '<button class="atable-btn reject" onclick="window.rejectReturning(''+s.id+'')">✗ Reject</button>'
-            : '<button class="atable-btn view" onclick="window.showToast(''+s.full_name+' — '+s.status.toUpperCase()+'','')">View</button>')
-        + '</div></td>'
-        + '</tr>';
+    if (status) q = q.eq('status',status);
+    if (search) q = q.ilike('full_name','%'+search+'%');
+    var res = await q;
+    var pending = res.data ? res.data.filter(function(d){ return d.status==='pending'; }).length : 0;
+    var badge = document.getElementById('badge-returning'); if(badge) badge.textContent = pending || '0';
+    if (!res.data || !res.data.length) { el.innerHTML = emptyState('🎓','No returning student registrations yet','Registrations will appear here once submitted.'); return; }
+    var rows = res.data.map(function(s){
+      var yr = s.year_admitted ? '20'+s.year_admitted : '—';
+      var passportCell = s.passport_url ? '<img src="'+s.passport_url+'" style="width:40px;height:50px;object-fit:cover;border-radius:6px;border:2px solid #e5e7eb;cursor:pointer" onclick="window.open(''+s.passport_url+'','_blank')" title="View passport">' : '<div style="width:40px;height:50px;background:#f1f5f9;border-radius:6px;display:flex;align-items:center;justify-content:center">👤</div>';
+      return '<tr><td>'+passportCell+'</td><td><strong>'+s.full_name+'</strong><br><span style="font-size:11px;color:#64748b">'+s.email+'</span></td><td>'+s.program+'</td><td>'+stBadge(s.phase)+'</td><td>'+yr+'</td><td>'+(s.session||'—')+'</td><td>'+(s.level||'—')+'</td><td>'+(s.prev_ref||'—')+'</td><td>'+(s.matric_number?'<code style="font-size:11px;background:#f1f5f9;padding:2px 6px;border-radius:4px">'+s.matric_number+'</code>':'<span style="color:#94a3b8;font-size:12px">Pending</span>')+'</td><td>'+stBadge(s.status)+'</td><td><div class="atable-actions">'+(s.status==='pending'?'<button class="atable-btn approve" onclick="window.approveReturning(''+s.id+'')">✓ Approve</button><button class="atable-btn reject" onclick="window.rejectReturning(''+s.id+'')">✗ Reject</button>':'<button class="atable-btn view" onclick="window.showToast(''+s.full_name+' — '+s.status.toUpperCase()+'','')">View</button>')+'</div></td></tr>';
     }).join('');
-
-    el.innerHTML = '<table class="atable"><thead><tr>'
-      + '<th>Photo</th><th>Name</th><th>Program</th><th>Phase</th><th>Year Admitted</th>'
-      + '<th>Session</th><th>Level</th><th>Prev. Ref</th><th>Matric No.</th><th>Status</th><th>Actions</th>'
-      + '</tr></thead><tbody>'+rows+'</tbody></table>';
-  } catch(e) { el.innerHTML = '<div class="admin-empty"><div class="icon">⚠️</div><h4>Error loading data</h4><p>'+e.message+'</p></div>'; }
+    el.innerHTML = '<table class="atable"><thead><tr><th>Photo</th><th>Name</th><th>Program</th><th>Phase</th><th>Year</th><th>Session</th><th>Level</th><th>Prev Ref</th><th>Matric</th><th>Status</th><th>Actions</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  } catch(e) { el.innerHTML = emptyState('⚠️','Error',''+e.message); }
 };
 
 window.approveReturning = async function(id) {
-  var sb = getSB(); if(!sb) return;
-  var { error } = await sb.from('returning_students').update({ status:'approved' }).eq('id', id);
-  if(error){ window.showToast('Error: '+error.message,'error'); return; }
+  var sb = getSB(); if (!sb) return;
+  var res = await sb.from('returning_students').update({status:'approved'}).eq('id',id);
+  if (res.error) { window.showToast('Error: '+res.error.message,'error'); return; }
   window.showToast('✅ Student approved! They can now log in and get their Matric Number.','success');
   window.loadReturningStudents();
-  window.loadDashboardStats();
 };
 
 window.rejectReturning = async function(id) {
-  var sb = getSB(); if(!sb) return;
-  var { error } = await sb.from('returning_students').update({ status:'rejected' }).eq('id', id);
-  if(error){ window.showToast('Error: '+error.message,'error'); return; }
+  var sb = getSB(); if (!sb) return;
+  var res = await sb.from('returning_students').update({status:'rejected'}).eq('id',id);
+  if (res.error) { window.showToast('Error: '+res.error.message,'error'); return; }
   window.showToast('❌ Registration rejected.','error');
   window.loadReturningStudents();
 };
 
-// ─── Students Panel ─────────────────────────────────────────────────────────
+// ── Students ──────────────────────────────────────────────────
 window.loadStudents = async function() {
   var el = document.getElementById('students-table-body');
+  if (!el) return;
   el.innerHTML = '<div class="admin-loading"><div class="spinner"></div>Loading...</div>';
-  var sb = getSB(); if (!sb) return;
-
+  var sb = getSB(); if (!sb) { el.innerHTML = emptyState('⚠️','DB not connected',''); return; }
   try {
-    var prog   = document.getElementById('filter-program') ? document.getElementById('filter-program').value : '';
+    var prog   = document.getElementById('filter-program')  ? document.getElementById('filter-program').value  : '';
     var search = document.getElementById('search-students') ? document.getElementById('search-students').value : '';
-
     var q = sb.from('students').select('*').order('created_at',{ascending:false});
-    if (prog)   q = q.eq('program', prog);
-    if (search) q = q.or('full_name.ilike.%' + search + '%,matric_number.ilike.%' + search + '%');
-
-    var { data, error } = await q;
-    if (error) throw error;
-    if (!data || !data.length) { el.innerHTML = emptyState('👨‍🎓','No students found','Admitted students will appear here.'); return; }
-
-    var rows = data.map(function(s){
-      return '<tr>'
-        + '<td><strong>' + (s.full_name||'—') + '</strong></td>'
-        + '<td><code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">' + (s.matric_number||'Pending') + '</code></td>'
-        + '<td>' + (s.program||'—') + '</td>'
-        + '<td>' + stBadge(s.phase) + '</td>'
-        + '<td>' + (s.session||'—') + '</td>'
-        + '<td>' + stBadge(s.status) + '</td>'
-        + '<td><div class="atable-actions"><button class="atable-btn view" onclick="window.showToast("Student profile coming soon","")">View</button></div></td>'
-        + '</tr>';
+    if (prog)   q = q.eq('program',prog);
+    if (search) q = q.or('full_name.ilike.%'+search+'%,matric_number.ilike.%'+search+'%');
+    var res = await q;
+    if (!res.data || !res.data.length) { el.innerHTML = emptyState('👨‍🎓','No students yet','Admitted students will appear here.'); return; }
+    var rows = res.data.map(function(s){
+      return '<tr><td><strong>'+(s.full_name||'—')+'</strong></td><td><code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">'+(s.matric_number||'Pending')+'</code></td><td>'+(s.program||'—')+'</td><td>'+stBadge(s.phase)+'</td><td>'+(s.session||'—')+'</td><td>'+stBadge(s.status)+'</td></tr>';
     }).join('');
-
-    el.innerHTML = '<table class="atable"><thead><tr><th>Name</th><th>Matric No.</th><th>Program</th><th>Phase</th><th>Session</th><th>Status</th><th>Action</th></tr></thead><tbody>' + rows + '</tbody></table>';
-  } catch(e) { el.innerHTML = emptyState('⚠️','Error', e.message); }
+    el.innerHTML = '<table class="atable"><thead><tr><th>Name</th><th>Matric No.</th><th>Program</th><th>Phase</th><th>Session</th><th>Status</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  } catch(e) { el.innerHTML = emptyState('⚠️','Error',''+e.message); }
 };
 
-// ── Payments Panel ─────────────────────────────────────────────────────────
+// ── Payments ──────────────────────────────────────────────────
 window.loadPayments = async function() {
   var el = document.getElementById('payments-table-body');
+  if (!el) return;
   el.innerHTML = '<div class="admin-loading"><div class="spinner"></div>Loading...</div>';
-  var sb = getSB(); if (!sb) return;
-
+  var sb = getSB(); if (!sb) { el.innerHTML = emptyState('⚠️','DB not connected',''); return; }
   try {
-    var type   = document.getElementById('filter-pay-type') ? document.getElementById('filter-pay-type').value : '';
-    var search = document.getElementById('search-payments') ? document.getElementById('search-payments').value : '';
-
+    var type   = document.getElementById('filter-pay-type')  ? document.getElementById('filter-pay-type').value  : '';
+    var search = document.getElementById('search-payments')  ? document.getElementById('search-payments').value  : '';
     var q = sb.from('payments').select('*').order('created_at',{ascending:false});
-    if (type)   q = q.eq('stage_id', type);
-    if (search) q = q.ilike('full_name','%' + search + '%');
-
-    var { data, error } = await q;
-    if (error) throw error;
-
-    // Compute pay stats
+    if (type)   q = q.eq('stage_id',type);
+    if (search) q = q.ilike('full_name','%'+search+'%');
+    var res = await q;
     var total = 0, pending = 0, defaulters = new Set();
-    if (data) { data.forEach(function(p){
-      if (p.status === 'paid') total += (p.amount||0);
-      else { pending++; defaulters.add(p.student_ref||p.full_name); }
-    }); }
-    document.getElementById('pay-stat-total').textContent      = '₦' + fmt(total);
-    document.getElementById('pay-stat-pending').textContent    = pending;
-    document.getElementById('pay-stat-defaulters').textContent = defaulters.size;
-
-    if (!data || !data.length) { el.innerHTML = emptyState('💰','No payment records','Payments will appear here once students pay.'); return; }
-
-    var rows = data.map(function(p){
+    if (res.data) res.data.forEach(function(p){ if(p.status==='paid') total+=(p.amount||0); else { pending++; defaulters.add(p.full_name); } });
+    function setEl(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; }
+    setEl('pay-stat-total',      '₦'+fmt(total));
+    setEl('pay-stat-pending',    pending);
+    setEl('pay-stat-defaulters', defaulters.size);
+    if (!res.data || !res.data.length) { el.innerHTML = emptyState('💰','No payments yet','Payments will appear here once students pay.'); return; }
+    var rows = res.data.map(function(p){
       var date = p.created_at ? new Date(p.created_at).toLocaleDateString('en-NG') : '—';
-      return '<tr>'
-        + '<td><strong>' + (p.full_name||'—') + '</strong></td>'
-        + '<td>' + (p.stage_label||'—') + '</td>'
-        + '<td><strong>₦' + fmt(p.amount) + '</strong></td>'
-        + '<td>' + (p.tx_ref||p.receipt||'—') + '</td>'
-        + '<td>' + stBadge(p.status) + '</td>'
-        + '<td>' + date + '</td>'
-        + '</tr>';
+      return '<tr><td><strong>'+(p.full_name||'—')+'</strong></td><td>'+(p.stage_label||'—')+'</td><td><strong>₦'+fmt(p.amount)+'</strong></td><td>'+(p.tx_ref||'—')+'</td><td>'+stBadge(p.status)+'</td><td>'+date+'</td></tr>';
     }).join('');
-    el.innerHTML = '<table class="atable"><thead><tr><th>Name</th><th>Payment Type</th><th>Amount</th><th>Ref / Receipt</th><th>Status</th><th>Date</th></tr></thead><tbody>' + rows + '</tbody></table>';
-  } catch(e) { el.innerHTML = emptyState('⚠️','Error', e.message); }
+    el.innerHTML = '<table class="atable"><thead><tr><th>Name</th><th>Payment Type</th><th>Amount</th><th>Ref</th><th>Status</th><th>Date</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  } catch(e) { el.innerHTML = emptyState('⚠️','Error',''+e.message); }
 };
 
-// ── Results Panel ──────────────────────────────────────────────────────────
+// ── Results ───────────────────────────────────────────────────
 window.uploadResult = async function() {
   var sb = getSB(); if (!sb) { window.showToast('DB not connected','error'); return; }
-  var matric  = document.getElementById('res-matric').value.trim();
-  var sem     = document.getElementById('res-semester').value;
-  var code    = document.getElementById('res-course-code').value.trim();
-  var title   = document.getElementById('res-course-title').value.trim();
-  var score   = document.getElementById('res-score').value;
-  var grade   = document.getElementById('res-grade').value;
+  var matric = document.getElementById('res-matric') ? document.getElementById('res-matric').value.trim() : '';
+  var sem    = document.getElementById('res-semester')     ? document.getElementById('res-semester').value     : '';
+  var code   = document.getElementById('res-course-code')  ? document.getElementById('res-course-code').value.trim()  : '';
+  var title  = document.getElementById('res-course-title') ? document.getElementById('res-course-title').value.trim() : '';
+  var score  = document.getElementById('res-score')  ? document.getElementById('res-score').value  : '';
+  var grade  = document.getElementById('res-grade')  ? document.getElementById('res-grade').value  : '';
   if (!matric||!code||!title||!score) { window.showToast('Please fill all result fields.','error'); return; }
-
-  var { error } = await sb.from('results').insert({
-    matric_number: matric, semester: sem, course_code: code,
-    course_title: title, score: parseInt(score), grade, uploaded_by: adminSession.email
-  });
-  if (error) { window.showToast('Error: ' + error.message,'error'); return; }
-  window.showToast('✅ Result uploaded successfully!','success');
-  ['res-matric','res-course-code','res-course-title','res-score'].forEach(function(id){ document.getElementById(id).value=''; });
+  var res = await sb.from('results').insert({ matric_number:matric, semester:sem, course_code:code, course_title:title, score:parseInt(score), grade, uploaded_by:_adminSession?_adminSession.email:'' });
+  if (res.error) { window.showToast('Error: '+res.error.message,'error'); return; }
+  window.showToast('✅ Result uploaded!','success');
+  ['res-matric','res-course-code','res-course-title','res-score'].forEach(function(id){ var e=document.getElementById(id); if(e) e.value=''; });
   window.loadResults();
 };
 
 window.loadResults = async function() {
   var el = document.getElementById('results-table-body');
+  if (!el) return;
   el.innerHTML = '<div class="admin-loading"><div class="spinner"></div>Loading...</div>';
   var sb = getSB(); if (!sb) return;
   var search = document.getElementById('search-results') ? document.getElementById('search-results').value : '';
   var q = sb.from('results').select('*').order('created_at',{ascending:false});
   if (search) q = q.or('matric_number.ilike.%'+search+'%,course_title.ilike.%'+search+'%');
-  var { data, error } = await q;
-  if (error || !data || !data.length) { el.innerHTML = emptyState('📊','No results uploaded','Use the form above to upload student results.'); return; }
-  var rows = data.map(function(r){
-    return '<tr><td><code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">'+r.matric_number+'</code></td><td>'+r.course_code+'</td><td>'+r.course_title+'</td><td>'+r.semester+'</td><td><strong>'+r.score+'</strong></td><td><strong style="color:'+(r.grade==='A'?'#059669':r.grade==='F'?'#dc2626':'#1e1b4b')+'">'+r.grade+'</strong></td></tr>';
+  var res = await q;
+  if (!res.data || !res.data.length) { el.innerHTML = emptyState('📊','No results uploaded','Use the form above to upload results.'); return; }
+  var rows = res.data.map(function(r){
+    return '<tr><td><code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">'+r.matric_number+'</code></td><td>'+r.course_code+'</td><td>'+r.course_title+'</td><td>'+r.semester+'</td><td>'+r.score+'</td><td><strong style="color:'+(r.grade==='A'?'#059669':r.grade==='F'?'#dc2626':'#1e1b4b')+'">'+r.grade+'</strong></td></tr>';
   }).join('');
-  el.innerHTML = '<table class="atable"><thead><tr><th>Matric No.</th><th>Code</th><th>Course</th><th>Semester</th><th>Score</th><th>Grade</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  el.innerHTML = '<table class="atable"><thead><tr><th>Matric</th><th>Code</th><th>Course</th><th>Semester</th><th>Score</th><th>Grade</th></tr></thead><tbody>'+rows+'</tbody></table>';
 };
 
-// ── Staff Panel ────────────────────────────────────────────────────────────
+// ── Staff ─────────────────────────────────────────────────────
 window.createStaffAccount = async function() {
   var sb = getSB(); if (!sb) return;
-  var name  = document.getElementById('staff-name').value.trim();
-  var email = document.getElementById('staff-email').value.trim();
-  var role  = document.getElementById('staff-role').value;
-  var pass  = document.getElementById('staff-pass').value;
-  if (!name||!email||!pass) { window.showToast('Please fill all staff fields.','error'); return; }
-
-  try {
-    // Create Supabase auth user
-    var { data: authData, error: authErr } = await getSB().auth.admin ? 
-      { data: null, error: { message: 'Use Supabase dashboard to create auth users' } } :
-      { data: null, error: null };
-
-    // Insert into staff table
-    var { error } = await sb.from('staff').insert({ full_name: name, email, role, created_by: adminSession.email });
-    if (error) throw error;
-    window.showToast('✅ Staff account created! Ask them to set password via Supabase.','success');
-    ['staff-name','staff-email','staff-pass'].forEach(function(id){ document.getElementById(id).value=''; });
-    window.loadStaff();
-  } catch(e) { window.showToast('Error: ' + e.message,'error'); }
+  var name  = document.getElementById('staff-name')  ? document.getElementById('staff-name').value.trim()  : '';
+  var email = document.getElementById('staff-email') ? document.getElementById('staff-email').value.trim() : '';
+  var role  = document.getElementById('staff-role')  ? document.getElementById('staff-role').value          : '';
+  if (!name||!email) { window.showToast('Please fill all staff fields.','error'); return; }
+  var res = await sb.from('staff').insert({ full_name:name, email, role, created_by:_adminSession?_adminSession.email:'' });
+  if (res.error) { window.showToast('Error: '+res.error.message,'error'); return; }
+  window.showToast('✅ Staff record created!','success');
+  window.loadStaff();
 };
 
 window.loadStaff = async function() {
   var el = document.getElementById('staff-table-body');
+  if (!el) return;
   el.innerHTML = '<div class="admin-loading"><div class="spinner"></div>Loading...</div>';
   var sb = getSB(); if (!sb) return;
-  var { data, error } = await sb.from('staff').select('*').order('created_at',{ascending:false});
-  if (error || !data || !data.length) { el.innerHTML = emptyState('👥','No staff accounts yet','Create staff accounts using the form above.'); return; }
-  var rows = data.map(function(s){
-    var meta = ROLE_META[s.role] || { label: s.role };
-    return '<tr><td><strong>'+s.full_name+'</strong></td><td>'+s.email+'</td><td><span class="st-badge st-nd">'+meta.label+'</span></td><td><button class="atable-btn reject" onclick="window.showToast("Delete coming soon","")">Remove</button></td></tr>';
+  var res = await sb.from('staff').select('*').order('created_at',{ascending:false});
+  if (!res.data || !res.data.length) { el.innerHTML = emptyState('👥','No staff accounts','Create staff accounts using the form above.'); return; }
+  var rows = res.data.map(function(s){
+    return '<tr><td><strong>'+s.full_name+'</strong></td><td>'+s.email+'</td><td><span class="st-badge st-nd">'+(ROLE_LABELS[s.role]||s.role)+'</span></td></tr>';
   }).join('');
-  el.innerHTML = '<table class="atable"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Action</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  el.innerHTML = '<table class="atable"><thead><tr><th>Name</th><th>Email</th><th>Role</th></tr></thead><tbody>'+rows+'</tbody></table>';
 };
 
-// ── Settings ───────────────────────────────────────────────────────────────
-window.saveSettings = async function() {
-  window.showToast('✅ Settings saved successfully!','success');
+// ── Settings ──────────────────────────────────────────────────
+window.saveSettings = function() {
+  window.showToast('✅ Settings saved!','success');
 };
-
-// ── Admin Logout ───────────────────────────────────────────────────────────
-window.adminLogout = async function() {
-  var sb = getSB(); if (sb) await sb.auth.signOut();
-  adminSession = { loggedIn:false, role:null, email:null, name:null };
-  document.getElementById('admin-dashboard').style.display = 'none';
-  document.getElementById('admin-dashboard').classList.remove('open');
-  document.getElementById('site-footer').style.display = '';
-  window.showPage('home');
-  window.showToast('You have been logged out of the admin portal.','');
-};
-
-// ── Fallback for no DB ─────────────────────────────────────────────────────
-function showAdminFallback() {
-  ['stat-applications','stat-admitted','stat-pending'].forEach(function(id){
-    var el = document.getElementById(id); if(el) el.textContent = '—';
-  });
-  var revEl = document.getElementById('stat-revenue'); if(revEl) revEl.textContent = '—';
-  var ra = document.getElementById('dash-recent-apps');
-  var rp = document.getElementById('dash-recent-payments');
-  if(ra) ra.innerHTML = emptyState('⚠️','Database Setup Required','Please set up the Supabase tables. See setup guide below.');
-  if(rp) rp.innerHTML = emptyState('⚠️','Database Setup Required','Tables not yet created in Supabase.');
-}
-
-function emptyState(icon, title, msg) {
-  return '<div class="admin-empty"><div class="icon">'+icon+'</div><h4>'+title+'</h4><p>'+msg+'</p></div>';
-}
-
-// end admin JS
 </script>
 
 <!-- ===== RETURNING STUDENT JS ===== -->
