@@ -831,6 +831,9 @@ footer { background: var(--navy); color: rgba(255,255,255,0.8); padding: 60px 0 
   z-index:99999;display:none;align-items:center;justify-content:center;
   padding:20px;backdrop-filter:blur(6px);
 }
+#admin-login-overlay.open {
+  display:flex !important;
+}
 #admin-login-overlay[style*="flex"] { align-items:center !important; justify-content:center !important; }
 
 .admin-login-modal {
@@ -3966,8 +3969,16 @@ var _adminSession = null;
 // ── Open / Close Login Modal ──────────────────────────────────
 window.openAdminLogin = function() {
   var o = document.getElementById('admin-login-overlay');
-  if (o) { o.style.display = 'flex'; o.classList.add('open'); }
-  setTimeout(function(){ var e = document.getElementById('admin-email'); if(e) e.focus(); }, 150);
+  if (!o) { alert('Admin login not found. Please hard-reload the page (Ctrl+Shift+R).'); return; }
+  o.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);';
+  o.classList.add('open');
+  var errEl = document.getElementById('admin-login-error');
+  if (errEl) errEl.style.display = 'none';
+  var emailEl = document.getElementById('admin-email');
+  var passEl  = document.getElementById('admin-password');
+  if (emailEl) emailEl.value = '';
+  if (passEl)  passEl.value  = '';
+  setTimeout(function(){ if (emailEl) emailEl.focus(); }, 150);
 };
 
 window.closeAdminLogin = function() {
