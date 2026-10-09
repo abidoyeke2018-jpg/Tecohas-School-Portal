@@ -3500,21 +3500,18 @@ document.addEventListener('DOMContentLoaded',function(){
       <div class="admin-logo-icon">🔐</div>
       <h2>TECOHAS Admin Portal</h2>
       <p>Secure access for authorised staff only</p>
-      <div class="admin-role-pills">
-        <span class="admin-role-pill active" onclick="window.selectAdminRole('super_admin',this)">👑 Super Admin</span>
-        <span class="admin-role-pill" onclick="window.selectAdminRole('admissions',this)">📋 Admissions</span>
-        <span class="admin-role-pill" onclick="window.selectAdminRole('bursary',this)">💰 Bursary</span>
-        <span class="admin-role-pill" onclick="window.selectAdminRole('academic',this)">🎓 Academic</span>
-      </div>
+
     </div>
     <div class="admin-login-body">
       <div class="form-group">
         <label>Staff Email</label>
-        <input type="email" id="admin-email" placeholder="staff@tecohas.edu.ng" autocomplete="email">
+        <input type="email" id="admin-email" placeholder="staff@tecohas.edu.ng" autocomplete="email"
+               onkeydown="if(event.key==='Enter')window.doAdminLogin()">
       </div>
       <div class="form-group">
         <label>Password</label>
-        <input type="password" id="admin-password" placeholder="Enter your password" autocomplete="current-password">
+        <input type="password" id="admin-password" placeholder="Enter your password" autocomplete="current-password"
+               onkeydown="if(event.key==='Enter')window.doAdminLogin()">
       </div>
       <div id="admin-login-error" style="display:none;background:#fee2e2;color:#991b1b;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;"></div>
       <button class="btn btn-admin" id="admin-signin-btn" style="width:100%;justify-content:center;padding:12px"
@@ -3938,7 +3935,7 @@ document.addEventListener('DOMContentLoaded',function(){
 <script>
 // ── ADMIN CREDENTIALS (works without Supabase) ─────────────────────────────
 var ADMIN_CREDENTIALS = {
-  'tabukgmodel@gmail.com':     { password: 'Admin@Tecohas2026',      role: 'super_admin', name: 'Akinwumi Tabitha Bukola'   },
+  'tabukgmodel@gmail.com':     { password: 'Tecohas@SuperAdmin7741', role: 'super_admin', name: 'Akinwumi Tabitha Bukola'   },
   'arthurtemi@gmail.com':      { password: 'Tecohas@Academic3829',   role: 'academic',    name: 'TECOHAS Academic Officer'  },
   'tecohasregistry@gmail.com': { password: 'Tecohas@Registry5163',   role: 'admissions',  name: 'TECOHAS Registry Officer'  },
   'tecohasbursery@gmail.com':  { password: 'Tecohas@Bursary9204',    role: 'bursary',     name: 'TECOHAS Bursary Officer'   }
