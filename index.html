@@ -1189,21 +1189,147 @@ table.atable tr:hover td { background:#f8fafc; }
 </head>
 <body>
 <script>
-// ── EARLY ADMIN FUNCTIONS — defined immediately on page load ──
+// ══════════════════════════════════════════════════════
+// ADMIN LOGIN — Self-contained, loads immediately
+// ══════════════════════════════════════════════════════
+var ADMIN_DB = {
+  'tabukgmodel@gmail.com':     { pw: 'Tecohas@SuperAdmin7741', role: 'super_admin', name: 'Akinwumi Tabitha Bukola'  },
+  'arthurtemi@gmail.com':      { pw: 'Tecohas@Academic3829',   role: 'academic',    name: 'TECOHAS Academic Officer' },
+  'tecohasregistry@gmail.com': { pw: 'Tecohas@Registry5163',   role: 'admissions',  name: 'TECOHAS Registry Officer' },
+  'tecohasbursery@gmail.com':  { pw: 'Tecohas@Bursary9204',    role: 'bursary',     name: 'TECOHAS Bursary Officer'  }
+};
+
+var ROLE_DISPLAY = {
+  super_admin: '👑 Super Admin',
+  admissions:  '📋 Admissions Officer',
+  bursary:     '💰 Bursary Officer',
+  academic:    '🎓 Academic Officer'
+};
+
+var _adminSession = null;
+
 window.openAdminLogin = function() {
   var o = document.getElementById('admin-login-overlay');
-  if (!o) { setTimeout(window.openAdminLogin, 200); return; }
-  o.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  if (!o) { setTimeout(window.openAdminLogin, 300); return; }
+  o.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
   var errEl = document.getElementById('admin-login-error');
   if (errEl) errEl.style.display = 'none';
-  setTimeout(function(){ 
-    var e = document.getElementById('admin-email'); 
-    if (e) e.focus(); 
-  }, 150);
+  var emailEl = document.getElementById('admin-email');
+  var passEl  = document.getElementById('admin-password');
+  if (emailEl) emailEl.value = '';
+  if (passEl)  passEl.value  = '';
+  setTimeout(function(){ if (emailEl) emailEl.focus(); }, 200);
 };
+
 window.closeAdminLogin = function() {
   var o = document.getElementById('admin-login-overlay');
   if (o) o.style.display = 'none';
+};
+
+window.doAdminLogin = function() {
+  var emailEl = document.getElementById('admin-email');
+  var passEl  = document.getElementById('admin-password');
+  var errEl   = document.getElementById('admin-login-error');
+  var btn     = document.getElementById('admin-signin-btn');
+
+  if (errEl) errEl.style.display = 'none';
+
+  var email = emailEl ? emailEl.value.trim().toLowerCase() : '';
+  var pass  = passEl  ? passEl.value : '';
+
+  if (!email || !pass) {
+    if (errEl) { errEl.textContent = 'Please enter your email and password.'; errEl.style.display = 'block'; }
+    return;
+  }
+
+  if (btn) { btn.textContent = '⏳ Signing in...'; btn.disabled = true; }
+
+  var cred = ADMIN_DB[email];
+
+  if (!cred) {
+    if (errEl) { errEl.textContent = 'Email not recognised. Contact the Super Admin.'; errEl.style.display = 'block'; }
+    if (btn)   { btn.textContent = '🔐 Sign In to Admin Portal'; btn.disabled = false; }
+    return;
+  }
+
+  if (cred.pw !== pass) {
+    if (errEl) { errEl.textContent = 'Incorrect password. Please try again.'; errEl.style.display = 'block'; }
+    if (btn)   { btn.textContent = '🔐 Sign In to Admin Portal'; btn.disabled = false; }
+    return;
+  }
+
+  // ── Success ───────────────────────────────────────────────────
+  _adminSession = { loggedIn: true, role: cred.role, email: email, name: cred.name };
+  if (btn) { btn.textContent = '🔐 Sign In to Admin Portal'; btn.disabled = false; }
+  window.closeAdminLogin();
+
+  setTimeout(function() {
+    window.launchAdminDashboard();
+  }, 100);
+};
+
+window.launchAdminDashboard = function() {
+  if (!_adminSession || !_adminSession.loggedIn) return;
+  var s = _adminSession;
+
+  // Hide student pages
+  var pages = document.querySelectorAll('.page');
+  for (var i = 0; i < pages.length; i++) pages[i].classList.remove('active');
+  var dash   = document.getElementById('dashboard');    if (dash)   dash.classList.remove('open');
+  var footer = document.getElementById('site-footer'); if (footer) footer.style.display = 'none';
+
+  // Show admin dashboard
+  var ad = document.getElementById('admin-dashboard');
+  if (!ad) { alert('Admin dashboard not found. Please hard-reload (Ctrl+Shift+R).'); return; }
+  ad.style.display = 'block';
+  ad.classList.add('open');
+  window.scrollTo(0, 0);
+
+  // Set display info
+  var roleLabel = ROLE_DISPLAY[s.role] || s.role;
+  var initials  = s.name.split(' ').map(function(w){ return w[0]; }).join('').toUpperCase().slice(0,2);
+
+  function setEl(id, val) { var e = document.getElementById(id); if (e) e.textContent = val; }
+  setEl('admin-role-display',    roleLabel);
+  setEl('admin-role-tag',        roleLabel);
+  setEl('admin-name-display',    s.name);
+  setEl('admin-email-display',   s.email);
+  setEl('admin-avatar-initials', initials);
+  setEl('admin-avatar-bar',      initials);
+
+  var mob = document.getElementById('admin-mob-toggle');
+  if (mob) mob.style.display = 'flex';
+
+  // Role-based nav
+  var navAll = ['applications','returning','students','payments','results','staff','settings'];
+  var navMap = {
+    super_admin: ['applications','returning','students','payments','results','staff','settings'],
+    admissions:  ['applications','returning','students'],
+    bursary:     ['payments','students'],
+    academic:    ['results','students']
+  };
+  var allowed = navMap[s.role] || [];
+  navAll.forEach(function(panel) {
+    var btn = document.querySelector('button[onclick="window.showAdminPanel(''+panel+'')"]');
+    if (btn) btn.style.display = allowed.indexOf(panel) !== -1 ? 'flex' : 'none';
+  });
+
+  // Load initial panel
+  if (typeof window.showAdminPanel === 'function') {
+    window.showAdminPanel('dashboard');
+  }
+  if (typeof window.loadDashboardStats === 'function') {
+    window.loadDashboardStats();
+  }
+};
+
+window.adminLogout = function() {
+  _adminSession = null;
+  var ad = document.getElementById('admin-dashboard');
+  if (ad) { ad.style.display = 'none'; ad.classList.remove('open'); }
+  var footer = document.getElementById('site-footer'); if (footer) footer.style.display = '';
+  if (typeof window.showPage === 'function') window.showPage('home');
+  if (typeof window.showToast === 'function') window.showToast('You have been logged out.', '');
 };
 </script>
 
@@ -3968,126 +4094,7 @@ function getSB() {
   return _sb;
 }
 
-// ── Admin Credentials ─────────────────────────────────────────
-var ADMIN_CREDENTIALS = {
-  'tabukgmodel@gmail.com':     { password: 'Tecohas@SuperAdmin7741', role: 'super_admin', name: 'Akinwumi Tabitha Bukola'  },
-  'arthurtemi@gmail.com':      { password: 'Tecohas@Academic3829',   role: 'academic',    name: 'TECOHAS Academic Officer' },
-  'tecohasregistry@gmail.com': { password: 'Tecohas@Registry5163',   role: 'admissions',  name: 'TECOHAS Registry Officer' },
-  'tecohasbursery@gmail.com':  { password: 'Tecohas@Bursary9204',    role: 'bursary',     name: 'TECOHAS Bursary Officer'  }
-};
-
-var ROLE_LABELS = {
-  super_admin: '👑 Super Admin',
-  admissions:  '📋 Admissions Officer',
-  bursary:     '💰 Bursary Officer',
-  academic:    '🎓 Academic Officer'
-};
-
-var _adminSession = null;
-
-// ── Open / Close Login Modal ──────────────────────────────────
-// openAdminLogin defined early in page load (see top of body)
-
-// closeAdminLogin defined early in page load (see top of body)
-
-// ── Login ─────────────────────────────────────────────────────
-window.doAdminLogin = function() {
-  var emailEl = document.getElementById('admin-email');
-  var passEl  = document.getElementById('admin-password');
-  var errEl   = document.getElementById('admin-login-error');
-  var btn     = document.getElementById('admin-signin-btn');
-
-  if (errEl) errEl.style.display = 'none';
-
-  var email = emailEl ? emailEl.value.trim().toLowerCase() : '';
-  var pass  = passEl  ? passEl.value                       : '';
-
-  if (!email || !pass) {
-    if (errEl) { errEl.textContent = 'Please enter your email and password.'; errEl.style.display = 'block'; }
-    return;
-  }
-
-  if (btn) { btn.textContent = '⏳ Signing in...'; btn.disabled = true; }
-
-  var cred = ADMIN_CREDENTIALS[email];
-
-  if (!cred) {
-    if (errEl) { errEl.textContent = 'Email not found. Contact the Super Admin.'; errEl.style.display = 'block'; }
-    if (btn)   { btn.textContent = '🔐 Sign In to Admin Portal'; btn.disabled = false; }
-    return;
-  }
-
-  if (cred.password !== pass) {
-    if (errEl) { errEl.textContent = 'Incorrect password. Please try again.'; errEl.style.display = 'block'; }
-    if (btn)   { btn.textContent = '🔐 Sign In to Admin Portal'; btn.disabled = false; }
-    return;
-  }
-
-  _adminSession = { loggedIn: true, role: cred.role, email: email, name: cred.name };
-
-  setTimeout(function() {
-    if (btn) { btn.textContent = '🔐 Sign In to Admin Portal'; btn.disabled = false; }
-    window.closeAdminLogin();
-    window.launchAdminDashboard();
-  }, 300);
-};
-
-// ── Launch Dashboard ──────────────────────────────────────────
-window.launchAdminDashboard = function() {
-  if (!_adminSession || !_adminSession.loggedIn) return;
-  var cred = _adminSession;
-
-  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
-  var sd = document.getElementById('dashboard'); if (sd) sd.classList.remove('open');
-  var footer = document.getElementById('site-footer'); if (footer) footer.style.display = 'none';
-
-  var ad = document.getElementById('admin-dashboard');
-  if (!ad) { alert('Admin dashboard element not found. Please reload the page.'); return; }
-  ad.style.display = 'block';
-  ad.classList.add('open');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-
-  var roleLabel = ROLE_LABELS[cred.role] || cred.role;
-  var initials  = cred.name.split(' ').map(function(w){ return w[0]; }).join('').toUpperCase().slice(0,2);
-
-  function setEl(id, val) { var e = document.getElementById(id); if (e) e.textContent = val; }
-  setEl('admin-role-display',    roleLabel);
-  setEl('admin-role-tag',        roleLabel);
-  setEl('admin-name-display',    cred.name);
-  setEl('admin-email-display',   cred.email);
-  setEl('admin-avatar-initials', initials);
-  setEl('admin-avatar-bar',      initials);
-
-  var mob = document.getElementById('admin-mob-toggle');
-  if (mob) mob.style.display = 'flex';
-
-  // Role-based nav
-  var navAll = ['applications','returning','students','payments','results','staff','settings'];
-  var navMap  = {
-    super_admin: ['applications','returning','students','payments','results','staff','settings'],
-    admissions:  ['applications','returning','students'],
-    bursary:     ['payments','students'],
-    academic:    ['results','students']
-  };
-  var allowed = navMap[cred.role] || [];
-  navAll.forEach(function(panel) {
-    var btn = document.querySelector('button[onclick="window.showAdminPanel(''+panel+'')"]');
-    if (btn) btn.style.display = allowed.indexOf(panel) !== -1 ? 'flex' : 'none';
-  });
-
-  window.showAdminPanel('dashboard');
-  window.loadDashboardStats();
-};
-
-// ── Logout ────────────────────────────────────────────────────
-window.adminLogout = function() {
-  _adminSession = null;
-  var ad = document.getElementById('admin-dashboard');
-  if (ad) { ad.style.display = 'none'; ad.classList.remove('open'); }
-  var footer = document.getElementById('site-footer'); if (footer) footer.style.display = '';
-  window.showPage('home');
-  window.showToast('You have been logged out.', '');
-};
+// ── Admin login handled by early script at top of page ──
 
 // ── Panel Navigation ──────────────────────────────────────────
 window.showAdminPanel = function(panelId) {
