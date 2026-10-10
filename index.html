@@ -1188,6 +1188,25 @@ table.atable tr:hover td { background:#f8fafc; }
 </style>
 </head>
 <body>
+<script>
+// ── EARLY ADMIN FUNCTIONS — defined immediately on page load ──
+window.openAdminLogin = function() {
+  var o = document.getElementById('admin-login-overlay');
+  if (!o) { setTimeout(window.openAdminLogin, 200); return; }
+  o.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  var errEl = document.getElementById('admin-login-error');
+  if (errEl) errEl.style.display = 'none';
+  setTimeout(function(){ 
+    var e = document.getElementById('admin-email'); 
+    if (e) e.focus(); 
+  }, 150);
+};
+window.closeAdminLogin = function() {
+  var o = document.getElementById('admin-login-overlay');
+  if (o) o.style.display = 'none';
+};
+</script>
+
 
 <!-- ===== TOAST ===== -->
 <div class="toast" id="toast" role="alert" aria-live="polite"></div>
@@ -3967,24 +3986,9 @@ var ROLE_LABELS = {
 var _adminSession = null;
 
 // ── Open / Close Login Modal ──────────────────────────────────
-window.openAdminLogin = function() {
-  var o = document.getElementById('admin-login-overlay');
-  if (!o) { alert('Admin login not found. Please hard-reload the page (Ctrl+Shift+R).'); return; }
-  o.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);';
-  o.classList.add('open');
-  var errEl = document.getElementById('admin-login-error');
-  if (errEl) errEl.style.display = 'none';
-  var emailEl = document.getElementById('admin-email');
-  var passEl  = document.getElementById('admin-password');
-  if (emailEl) emailEl.value = '';
-  if (passEl)  passEl.value  = '';
-  setTimeout(function(){ if (emailEl) emailEl.focus(); }, 150);
-};
+// openAdminLogin defined early in page load (see top of body)
 
-window.closeAdminLogin = function() {
-  var o = document.getElementById('admin-login-overlay');
-  if (o) { o.style.display = 'none'; o.classList.remove('open'); }
-};
+// closeAdminLogin defined early in page load (see top of body)
 
 // ── Login ─────────────────────────────────────────────────────
 window.doAdminLogin = function() {
