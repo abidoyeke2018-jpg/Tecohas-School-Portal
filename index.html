@@ -1358,7 +1358,7 @@ window.adminLogout = function() {
     </ul>
     <div class="nav-actions">
       <button class="btn btn-outline btn-sm" onclick="openLogin()">Portal Login</button>
-      <button class="btn btn-sm btn-admin" style="background:#4338ca;color:#fff;border-color:#4338ca;cursor:pointer" onclick="window.openAdminLogin()">🔐 Admin</button>
+      <button style="background:#4338ca;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;z-index:9999;position:relative" onclick="(function(){var o=document.getElementById('admin-login-overlay');if(o){o.style.position='fixed';o.style.top='0';o.style.left='0';o.style.width='100%';o.style.height='100%';o.style.background='rgba(0,0,0,0.85)';o.style.zIndex='999999';o.style.display='flex';o.style.alignItems='center';o.style.justifyContent='center';}else{alert('Please hard reload: Ctrl+Shift+R');}})()">🔐 Admin</button>
     </div>
     <button id="hamburger" aria-label="Toggle menu" aria-expanded="false" onclick="toggleMobile()">
       <span></span><span></span><span></span>
@@ -1373,7 +1373,7 @@ window.adminLogout = function() {
     <a href="#" onclick="showPage('contact');closeMobile()">📞 Contact</a>
     <a href="#" onclick="window.showPage('returning');closeMobile()" style="color:var(--teal);font-weight:700">🎓 Existing Students</a>
     <button class="btn btn-primary" onclick="openLogin();closeMobile()">Portal Login</button>
-    <button class="btn" onclick="window.openAdminLogin();closeMobile()" style="background:#4338ca;color:#fff;border:none;padding:12px;border-radius:8px;font-weight:700;cursor:pointer;width:100%;margin-top:6px">🔐 Admin Portal</button>
+    <button onclick="(function(){var o=document.getElementById('admin-login-overlay');if(o){o.style.position='fixed';o.style.top='0';o.style.left='0';o.style.width='100%';o.style.height='100%';o.style.background='rgba(0,0,0,0.85)';o.style.zIndex='999999';o.style.display='flex';o.style.alignItems='center';o.style.justifyContent='center';}closeMobile();})()" style="background:#4338ca;color:#fff;border:none;padding:12px;border-radius:8px;font-weight:700;cursor:pointer;width:100%;margin-top:6px">🔐 Admin Portal</button>
   </div>
 </nav>
 
