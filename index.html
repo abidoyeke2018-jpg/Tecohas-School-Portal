@@ -1310,7 +1310,7 @@ window.launchAdminDashboard = function() {
   };
   var allowed = navMap[s.role] || [];
   navAll.forEach(function(panel) {
-    var btn = document.querySelector('button[onclick="window.showAdminPanel(\'' + panel + '\')"');
+    var btn = document.querySelector('[data-panel="' + panel + '"]');
     if (btn) btn.style.display = allowed.indexOf(panel) !== -1 ? 'flex' : 'none';
   });
 
@@ -3693,36 +3693,36 @@ document.addEventListener('DOMContentLoaded',function(){
       <!-- Super Admin Nav -->
       <div class="admin-nav-section" id="nav-super">
         <span class="admin-nav-label">Overview</span>
-        <button class="admin-nav-item active" onclick="window.showAdminPanel('dashboard')">
+        <button class="admin-nav-item active" data-panel="dashboard" onclick="window.showAdminPanel('dashboard')">
           <span class="nav-icon">📊</span> Dashboard
         </button>
         <span class="admin-nav-label" style="margin-top:12px">Management</span>
-        <button class="admin-nav-item" onclick="window.showAdminPanel('applications')">
+        <button class="admin-nav-item" data-panel="applications" onclick="window.showAdminPanel('applications')">
           <span class="nav-icon">📋</span> Applications
           <span class="admin-nav-badge" id="badge-applications">0</span>
         </button>
-        <button class="admin-nav-item" onclick="window.showAdminPanel('returning')">
+        <button class="admin-nav-item" data-panel="returning" onclick="window.showAdminPanel('returning')">
           <span class="nav-icon">🎓</span> Returning Students
           <span class="admin-nav-badge" id="badge-returning">0</span>
         </button>
-        <button class="admin-nav-item" onclick="window.showAdminPanel('returning')">
+        <button class="admin-nav-item" data-panel="returning" onclick="window.showAdminPanel('returning')">
           <span class="nav-icon">🎓</span> Existing Students
           <span class="admin-nav-badge" id="badge-returning">0</span>
         </button>
-        <button class="admin-nav-item" onclick="window.showAdminPanel('students')">
+        <button class="admin-nav-item" data-panel="students" onclick="window.showAdminPanel('students')">
           <span class="nav-icon">👨‍🎓</span> Students
         </button>
-        <button class="admin-nav-item" onclick="window.showAdminPanel('payments')">
+        <button class="admin-nav-item" data-panel="payments" onclick="window.showAdminPanel('payments')">
           <span class="nav-icon">💰</span> Payments
         </button>
-        <button class="admin-nav-item" onclick="window.showAdminPanel('results')">
+        <button class="admin-nav-item" data-panel="results" onclick="window.showAdminPanel('results')">
           <span class="nav-icon">📊</span> Results
         </button>
-        <button class="admin-nav-item" onclick="window.showAdminPanel('staff')">
+        <button class="admin-nav-item" data-panel="staff" onclick="window.showAdminPanel('staff')">
           <span class="nav-icon">👥</span> Staff Accounts
         </button>
         <span class="admin-nav-label" style="margin-top:12px">Settings</span>
-        <button class="admin-nav-item" onclick="window.showAdminPanel('settings')">
+        <button class="admin-nav-item" data-panel="settings" onclick="window.showAdminPanel('settings')">
           <span class="nav-icon">⚙️</span> Settings
         </button>
       </div>
@@ -4103,7 +4103,7 @@ window.showAdminPanel = function(panelId) {
   document.querySelectorAll('.admin-nav-item').forEach(function(b){ b.classList.remove('active'); });
   var panel = document.getElementById('panel-' + panelId);
   if (panel) panel.classList.add('active');
-  var navBtn = document.querySelector('button[onclick="window.showAdminPanel(\'' + panelId + '\')"');
+  var navBtn = document.querySelector('[data-panel="' + panelId + '"]');
   if (navBtn) navBtn.classList.add('active');
   var titles = {
     dashboard:    ['Dashboard Overview',          "Welcome back"],
@@ -4446,7 +4446,7 @@ window.previewPassport = function(input) {
     if(!document.getElementById('passport-change-btn')){
       var btn = document.createElement('div');
       btn.id = 'passport-change-btn';
-      btn.innerHTML = '<button type="button" onclick="event.stopPropagation();document.getElementById(\'ret-passport\').click()" style="margin-top:10px;padding:6px 16px;border:1.5px solid #4338ca;border-radius:6px;background:#fff;color:#4338ca;font-size:12px;font-weight:600;cursor:pointer">🔄 Change Photo</button>';
+      btn.innerHTML = '<button type="button" onclick="event.stopPropagation();document.getElementById(&quot;ret-passport&quot;).click()" style="margin-top:10px;padding:6px 16px;border:1.5px solid #4338ca;border-radius:6px;background:#fff;color:#4338ca;font-size:12px;font-weight:600;cursor:pointer">🔄 Change Photo</button>';
       box.appendChild(btn);
     }
   };
